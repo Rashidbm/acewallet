@@ -1,0 +1,1185 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<meta name="description" content="AceWallet automatically pays with your best card for every purchase, across the cards you already carry. Bilingual smart wallet for Saudi Arabia." />
+<title>AceWallet · Always play your ace</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<!-- Phosphor icons (hero category/reward row + feature cards) -->
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+<!-- dotLottie player (hero "hold near reader" glyph + step-4 confirm glyph) -->
+<script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
+
+<style>
+/* ============================================================================
+   AceWallet landing page.
+   Assembled from 5 already-built DARK graphics (hero iPhone + 4 how-it-works
+   panels). Each prebuilt component is inlined VERBATIM under its own CSS
+   @scope block so their shared class names (.panel/.device/.reward/.ring...)
+   never collide. Page chrome (nav, hero copy, what-you-get, closer, footer)
+   is built fresh in the global layer below.
+   Palette: near-black #0A0A0C, ONE accent emerald #2BD17E. Fonts: Inter (EN) +
+   IBM Plex Sans Arabic (AR). Full AR/EN RTL flip. Western numerals throughout.
+   ============================================================================ */
+
+/* ---------- tokens ---------- */
+:root{
+  --bg:#0A0A0C; --surface:#141417; --surface-2:#17171d;
+  --border:rgba(255,255,255,.08); --border-2:rgba(255,255,255,.13);
+  --text:#ECECEE; --muted:#8A8A90; --faint:#5a5a61;
+  --emerald:#2BD17E; --emerald-ink:#06160F; --emerald-soft:rgba(43,209,126,.14);
+  --screen-w:340px; --screen-h:736px;
+  --ease:cubic-bezier(.4,0,.2,1); --ease-out:cubic-bezier(.16,1,.3,1);
+  --en:'Inter', system-ui, -apple-system, sans-serif;
+  --ar:'IBM Plex Sans Arabic', 'Inter', system-ui, sans-serif;
+  --maxw:1180px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; -webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--text); font-family:var(--en);
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  line-height:1.55; overflow-x:hidden;
+}
+html[lang="ar"] body{ font-family:var(--ar) }
+a{color:inherit; text-decoration:none}
+img{max-width:100%; display:block}
+button{font-family:inherit}
+::selection{background:rgba(43,209,126,.28); color:#fff}
+:focus-visible{outline:2px solid var(--emerald); outline-offset:2px; border-radius:4px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+.wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  font-weight:600; font-size:15px; line-height:1; cursor:pointer; border:0;
+  border-radius:999px; padding:14px 22px; white-space:nowrap;
+  transition:transform .14s var(--ease), box-shadow .22s var(--ease), background .2s, filter .2s;
+}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--emerald); color:var(--emerald-ink); box-shadow:0 8px 24px -8px rgba(43,209,126,.55)}
+.btn-primary:hover{filter:brightness(1.05); box-shadow:0 12px 34px -8px rgba(43,209,126,.65)}
+.btn-ghost{background:rgba(255,255,255,.05); color:var(--text); border:1px solid var(--border-2)}
+.btn-ghost:hover{background:rgba(255,255,255,.09)}
+.btn-sm{padding:9px 15px; font-size:13.5px}
+
+/* ---------- nav ---------- */
+.nav{position:sticky; top:0; z-index:50; border-bottom:1px solid var(--border);
+  background:rgba(10,10,12,.72); backdrop-filter:blur(16px) saturate(150%); -webkit-backdrop-filter:blur(16px) saturate(150%)}
+.nav-in{display:flex; align-items:center; gap:18px; height:64px; max-width:var(--maxw); margin:0 auto; padding:0 24px}
+.brand{display:inline-flex; align-items:center; gap:9px; font-weight:600; font-size:17px; letter-spacing:-.02em; color:var(--text)}
+.brand .mark{width:25px; height:25px; flex:none; border-radius:7px; display:grid; place-items:center;
+  background:linear-gradient(150deg,#37e093,#1eae66); box-shadow:inset 0 1px 0 rgba(255,255,255,.4), 0 4px 10px -3px rgba(43,209,126,.5)}
+.brand .mark svg{width:14px; height:14px; color:var(--emerald-ink)}
+.nav-links{display:flex; gap:26px; margin-inline-start:14px}
+.nav-links a{color:var(--muted); font-size:14px; font-weight:500; transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-right{margin-inline-start:auto; display:flex; align-items:center; gap:10px}
+.lang-btn{background:rgba(255,255,255,.05); color:var(--text); border:1px solid var(--border-2);
+  border-radius:999px; padding:8px 14px; font-size:13px; font-weight:600; cursor:pointer; transition:background .2s; min-width:74px}
+.lang-btn:hover{background:rgba(255,255,255,.1)}
+@media(max-width:740px){ .nav-links{display:none} .nav-cta{display:none} }
+
+/* ---------- section rhythm ---------- */
+.sec{padding:104px 0; position:relative}
+.sec-head{max-width:680px; margin:0 auto 60px; text-align:center}
+.sec-kicker{display:block; font-size:12px; font-weight:600; color:var(--muted); margin:0 0 16px; letter-spacing:.14em; text-transform:uppercase}
+.sec-title{font-size:clamp(30px,4.4vw,46px); font-weight:600; letter-spacing:-.028em; line-height:1.06; margin:0}
+.sec-sub{margin:18px auto 0; color:var(--muted); font-size:clamp(15px,1.6vw,18px); max-width:54ch; line-height:1.6}
+
+/* ---------- hero ---------- */
+.hero{position:relative; overflow:hidden}
+.hero::before{content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
+  background:radial-gradient(680px 520px at 78% 34%, rgba(43,209,126,.11), transparent 62%)}
+html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%, rgba(43,209,126,.11), transparent 62%)}
+.hero-in{position:relative; z-index:1; display:grid; grid-template-columns:1.04fr .96fr; gap:40px; align-items:center;
+  max-width:var(--maxw); margin:0 auto; padding:36px 24px 64px; min-height:min(860px, calc(100dvh - 64px))}
+.hero-copy{max-width:580px}
+.h1{font-size:clamp(34px,5.3vw,58px); line-height:1.04; letter-spacing:-.032em; font-weight:600; margin:0; color:#fff}
+.hero-sub{margin:24px 0 0; font-size:clamp(16px,1.85vw,19px); line-height:1.6; color:#c4c4ca; max-width:46ch}
+.hero-sub .rot{color:var(--emerald); font-weight:600}
+.hero-form{margin-top:30px; max-width:440px}
+.hero-visual{display:flex; justify-content:center; align-items:center}
+@media(max-width:920px){
+  .hero-in{grid-template-columns:1fr; gap:8px; min-height:0; padding:20px 24px 48px; text-align:center}
+  .hero-copy{max-width:none; margin:0 auto}
+  .hero-sub{margin-inline:auto}
+  .hero-form{margin-inline:auto}
+  .hero-visual{order:2}
+}
+@media(max-width:430px){ .hero-mock{transform:scale(.84); transform-origin:top center; margin-bottom:-104px} }
+
+/* ---------- signup form ---------- */
+.signup{display:flex; flex-wrap:wrap; gap:10px}
+.signup .field{position:relative; flex:1 1 200px; min-width:0}
+.signup input[type="email"]{
+  width:100%; height:52px; padding:0 16px; border-radius:13px;
+  background:rgba(255,255,255,.04); border:1px solid var(--border-2); color:var(--text);
+  font-family:inherit; font-size:15px; outline:none; transition:border-color .2s, background .2s, box-shadow .2s}
+.signup input::placeholder{color:#6c6c73}
+.signup input:focus{border-color:rgba(43,209,126,.65); background:rgba(255,255,255,.06); box-shadow:0 0 0 3px rgba(43,209,126,.16)}
+.signup input.invalid{border-color:rgba(255,107,107,.7); box-shadow:0 0 0 3px rgba(255,107,107,.13)}
+.signup .btn{height:52px; flex:none}
+.form-foot{display:flex; flex-basis:100%; align-items:center; gap:8px; min-height:20px; margin-top:13px; font-size:13.5px; color:var(--muted)}
+.form-foot .micro{transition:opacity .2s}
+.form-foot .msg{font-weight:500}
+.form-foot .msg.ok{color:var(--emerald)}
+.form-foot .msg.err{color:#ff8a8a}
+@media(max-width:480px){ .signup{flex-direction:column} .signup .field{flex:0 0 auto; width:100%} .signup .btn{width:100%} }
+
+/* ---------- how it works : matched auto-animating row ---------- */
+.hiw-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:22px}
+.hiw{display:flex; flex-direction:column}
+.hiw-frame{position:relative; width:100%; aspect-ratio:480/470; border-radius:22px; overflow:hidden;
+  border:1px solid var(--border);
+  background:radial-gradient(125% 95% at 50% 22%, #17171d, #0a0a0d 78%);
+  box-shadow:0 30px 70px -34px rgba(0,0,0,.8)}
+.hiw-stage{position:absolute; top:0; left:0; width:480px; height:470px; transform-origin:top left; direction:ltr}
+.hiw-cap{margin:20px 4px 0}
+.hiw-cap .row{display:flex; align-items:baseline; gap:10px}
+.hiw-cap .num{font-size:12.5px; font-weight:700; color:var(--emerald); letter-spacing:.05em; font-variant-numeric:tabular-nums}
+.hiw-cap h3{margin:0; font-size:16.5px; font-weight:600; letter-spacing:-.012em; line-height:1.25}
+.hiw-cap p{margin:8px 0 0; color:var(--muted); font-size:13.5px; line-height:1.55}
+@media(max-width:1000px){ .hiw-grid{grid-template-columns:repeat(2,1fr); gap:26px; max-width:780px; margin-inline:auto} }
+@media(max-width:560px){ .hiw-grid{grid-template-columns:1fr; max-width:380px} }
+
+/* ---------- what you get ---------- */
+.wyg-grid{display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:54px; max-width:980px; margin-inline:auto}
+.wyg-card{position:relative; border:1px solid var(--border); border-radius:22px; padding:32px 30px 30px; overflow:hidden;
+  background:linear-gradient(180deg, rgba(255,255,255,.026), rgba(255,255,255,0));
+  display:flex; flex-direction:column; min-height:340px}
+.wyg-card h3{font-size:20px; font-weight:600; letter-spacing:-.015em; margin:0 0 10px; line-height:1.25}
+.wyg-card p{color:var(--muted); font-size:14.5px; line-height:1.6; margin:0; max-width:40ch}
+.wyg-card.best::after{content:""; position:absolute; left:50%; top:-26%; width:320px; height:220px; transform:translateX(-50%);
+  background:radial-gradient(closest-side, rgba(43,209,126,.12), transparent 70%); pointer-events:none; z-index:0}
+.wyg-card > *{position:relative; z-index:1}
+
+/* ---- feature visuals — research-led motion (Pointer/CardPointers ranking · Family/FLIP rise-to-top ·
+   Robinhood odometer · Linear edge-glow). Emerald stays reserved for the winning pick. ---- */
+.wyg-visual{margin-top:auto; position:relative; height:204px; overflow:hidden; border-radius:14px;
+  -webkit-mask:linear-gradient(#000 88%, transparent); mask:linear-gradient(#000 88%, transparent)}
+
+/* CARD 1 — "Never miss the highest reward": your real cards, ranked for the current spend. The
+   highest-earning card rises to the top, lights emerald, and its reward number rolls up. */
+.rack{position:absolute; inset:0; direction:ltr}
+.rack-intent{display:flex; align-items:center; justify-content:center; gap:7px; height:22px; margin-bottom:12px; font-size:12px; color:var(--muted)}
+.rack-intent .ri-cat{display:inline-flex; align-items:center; gap:6px; color:var(--text); font-weight:600}
+.rack-intent .ri-cat i{font-size:15px; color:var(--emerald)}
+.rack-intent.swap .ri-cat{animation:rackSwap .42s var(--ease)}
+.rack-list{position:relative; height:170px}
+.rk{position:absolute; left:0; right:0; top:0; height:38px; display:flex; align-items:center; gap:11px; padding:0 12px;
+  border:1px solid var(--border); border-radius:11px; background:rgba(255,255,255,.025); opacity:.82; filter:saturate(.4) brightness(.72);
+  transition:top .6s var(--ease-out), transform .6s var(--ease-out), filter .45s var(--ease), opacity .45s var(--ease), border-color .45s var(--ease), background .45s var(--ease), box-shadow .45s var(--ease)}
+.rk img{width:52px; height:auto; flex:none; border-radius:4px; box-shadow:0 2px 7px rgba(0,0,0,.55)}
+.rk .rk-rate{margin-inline-start:auto; height:22px; overflow:hidden}
+.rk .rk-num{display:inline-block; font-size:17px; font-weight:700; line-height:22px; letter-spacing:-.01em; color:var(--muted); font-variant-numeric:tabular-nums; transition:color .45s var(--ease)}
+.rk.win{opacity:1; filter:none; transform:scale(1.018); border-color:rgba(43,209,126,.5); background:rgba(43,209,126,.055);
+  box-shadow:0 0 0 1px rgba(43,209,126,.22), 0 10px 30px -8px rgba(43,209,126,.34)}
+.rk.win .rk-num{color:var(--emerald)}
+.rk.win.roll .rk-num{animation:numRoll .5s var(--ease-out)}
+
+/* CARD 2 — "No new card, no new account": the cards already in your wallet fan out like a hand. Emerald-free. */
+.fan{position:absolute; inset:0; perspective:1000px}
+.fc{position:absolute; left:50%; bottom:2px; width:150px; margin-left:-75px; border-radius:11px; overflow:hidden;
+  transform-origin:50% 168%; box-shadow:0 18px 34px -14px rgba(0,0,0,.85), 0 -1px 0 rgba(255,255,255,.05);
+  transition:transform .95s var(--ease-out)}
+.fc img{width:100%; display:block}
+.fc0{transform:rotate(-25deg)   translateY(4px)  scale(.95);  z-index:1}
+.fc1{transform:rotate(-12.5deg) translateY(-5px) scale(.985); z-index:2}
+.fc2{transform:rotate(0deg)     translateY(-9px) scale(1);    z-index:3}
+.fc3{transform:rotate(12.5deg)  translateY(-5px) scale(.985); z-index:2}
+.fc4{transform:rotate(25deg)    translateY(4px)  scale(.95);  z-index:1}
+
+/* cursor-follow border glow (Linear) — neutral light on the EDGE, not the face */
+.wyg-card .glow-border{position:absolute; inset:0; border-radius:22px; padding:1px; pointer-events:none; opacity:0; z-index:2; transition:opacity .3s var(--ease);
+  background:radial-gradient(360px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,.14), transparent 62%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite:exclude}
+.wyg-card:hover .glow-border{opacity:1}
+
+@keyframes numRoll{ 0%{opacity:0; transform:translateY(72%)} 100%{opacity:1; transform:translateY(0)} }
+@keyframes rackSwap{ 0%{opacity:1} 38%{opacity:0; transform:translateY(-5px)} 62%{opacity:0; transform:translateY(5px)} 100%{opacity:1; transform:translateY(0)} }
+
+@media (prefers-reduced-motion: no-preference){
+  /* the fan stays stacked until the card scrolls into view, then opens once into a hand */
+  .wyg-card:not(.in) .fan .fc{transform:rotate(0deg) translateY(13px) scale(.93)}
+  .wyg-card.in .fan .fc0{transition-delay:.05s} .wyg-card.in .fan .fc1{transition-delay:.12s}
+  .wyg-card.in .fan .fc2{transition-delay:.19s} .wyg-card.in .fan .fc3{transition-delay:.26s} .wyg-card.in .fan .fc4{transition-delay:.33s}
+}
+
+@media(max-width:820px){ .wyg-grid{grid-template-columns:1fr; max-width:480px} .wyg-card{min-height:0} }
+
+/* ---------- closer ---------- */
+.closer{position:relative; text-align:center; padding:128px 0 116px; overflow:hidden}
+.closer::before{content:""; position:absolute; left:50%; top:42%; width:760px; height:520px; transform:translate(-50%,-50%);
+  background:radial-gradient(closest-side, rgba(43,209,126,.16), transparent 72%); pointer-events:none}
+.closer-in{position:relative; z-index:1; max-width:680px; margin:0 auto; padding:0 24px}
+.closer-line{font-size:clamp(40px,7.4vw,76px); font-weight:600; letter-spacing:-.038em; line-height:1.02; margin:0; color:#fff}
+.closer-line .ace{color:var(--emerald)}
+.closer p{margin:22px auto 0; color:#bdbdc4; font-size:clamp(16px,1.8vw,19px); max-width:44ch; line-height:1.6}
+.closer .signup{margin:36px auto 0; max-width:460px}
+.closer .form-foot{justify-content:center}
+
+/* ---------- footer ---------- */
+.foot{border-top:1px solid var(--border); padding:38px 0}
+.foot-in{display:flex; flex-wrap:wrap; align-items:center; gap:16px 28px; max-width:var(--maxw); margin:0 auto; padding:0 24px}
+.foot-nav{display:flex; flex-wrap:wrap; gap:22px}
+.foot-nav a{color:var(--muted); font-size:14px; transition:color .2s}
+.foot-nav a:hover{color:var(--text)}
+.foot .tag{margin-inline-start:auto; color:var(--faint); font-size:13.5px}
+
+/* ---------- rotating word (width-morph + crossfade) ---------- */
+.rot{display:inline-block; vertical-align:baseline; white-space:nowrap; text-align:start; color:var(--emerald); font-weight:600;
+  transition:width .34s cubic-bezier(.4,0,.2,1)}
+.rot i{display:inline-block; font-style:normal; transition:opacity .2s ease}
+.rot.is-out i{opacity:0}
+
+/* ---------- scroll reveal ---------- */
+[data-reveal]{opacity:0; transform:translateY(22px); transition:opacity .7s var(--ease-out), transform .7s var(--ease-out)}
+[data-reveal].in{opacity:1; transform:none}
+
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  [data-reveal]{opacity:1; transform:none; transition:none}
+  .rot, .rot i{transition:none}
+  /* freeze the decorative CSS loops inside the step panels */
+  .hiw-stage *{animation:none !important}
+}
+
+/* ============================================================================
+   KEYFRAMES — hoisted from the prebuilt components (names are globally unique).
+   ============================================================================ */
+@keyframes cardSwap{0%{opacity:.5} 100%{opacity:1}}                                   /* hero card swap */
+@keyframes sway{                                                                       /* step1 deck */
+  0%,100%{transform:rotateX(8deg) rotateY(-15deg) translateY(-7px)}
+  50%    {transform:rotateX(6deg) rotateY(-3deg)  translateY(7px)}
+}
+@keyframes rise{from{opacity:0; transform:translateY(22px)} to{opacity:1; transform:translateY(0)}}  /* step1 cards */
+@keyframes sheen{0%,70%{transform:translateX(-120%)} 86%,100%{transform:translateX(120%)}}          /* step1 glare */
+@keyframes barpulse{0%,100%{box-shadow:0 0 11px 1px rgba(255,255,255,.28)} 50%{box-shadow:0 0 28px 5px rgba(255,255,255,.7)}} /* step2 */
+@keyframes pick{                                                                       /* step3 winner */
+  0%,7%   {transform:translateY(24px) scale(.99)}
+  22%,85% {transform:translateY(0) scale(1.015)}
+  100%    {transform:translateY(24px) scale(.99)}
+}
+@keyframes ring-in{0%,9%{opacity:0} 24%,85%{opacity:1} 98%,100%{opacity:0}}
+@keyframes pill-in{0%,12%{opacity:0; transform:scale(.97)} 26%,85%{opacity:1; transform:scale(1)} 97%,100%{opacity:0; transform:scale(.98)}}
+@keyframes recede{0%,9%{filter:blur(.6px)} 24%,85%{filter:blur(3px)} 100%{filter:blur(.6px)}}
+@keyframes glow-in{0%,9%{opacity:0} 28%,82%{opacity:.42} 98%,100%{opacity:0}}
+@keyframes lblflip{0%{opacity:0} 100%{opacity:1}}                                      /* step4 label */
+/* hero mockup — floating card depth, breathing glow, live dot, sheen sweep */
+@keyframes hero-float{ 0%,100%{transform:translateY(-6px) rotateX(5deg) rotateY(-4deg)} 50%{transform:translateY(6px) rotateX(3deg) rotateY(4deg)} }
+@keyframes hero-glow{ 0%,100%{opacity:.55} 50%{opacity:.9} }
+@keyframes hero-dot{ 0%,100%{opacity:.4; transform:scale(.8)} 50%{opacity:1; transform:scale(1)} }
+@keyframes hero-sheen{ 0%,72%{transform:translateX(-190%) skewX(-9deg)} 86%,100%{transform:translateX(320%) skewX(-9deg)} }
+
+/* ============================================================================
+   @scope — HERO mockup (inlined verbatim from iphone.html).
+   `.stage-glow` dropped (the page provides the hero glow); language is driven
+   by <html lang> via the hero's own MutationObserver in the script below.
+   ============================================================================ */
+.hero-mock{ direction:ltr; --muted:#7C7C83; --faint:#5a5a61 }
+@scope (.hero-mock){
+  .device{
+    position:relative; z-index:1;
+    width:calc(var(--screen-w) + 26px); height:calc(var(--screen-h) + 26px);
+    border-radius:58px; padding:13px;
+    background:linear-gradient(145deg,#43434a 0%,#1b1b1e 26%,#101012 54%,#202024 78%,#3a3a40 100%);
+    box-shadow:0 2px 2px rgba(255,255,255,.18) inset, 0 0 0 1px rgba(0,0,0,.6), 0 50px 90px -30px rgba(0,0,0,.85);
+  }
+  .btn-side{position:absolute; width:3px; border-radius:2px; background:linear-gradient(#2a2a2e,#141416)}
+  .btn-side.silent{left:-3px; top:118px; height:26px}
+  .btn-side.volup{left:-3px; top:166px; height:44px}
+  .btn-side.voldn{left:-3px; top:222px; height:44px}
+  .btn-side.power{right:-3px; top:188px; height:66px}
+  .screen{position:relative; width:var(--screen-w); height:var(--screen-h); border-radius:46px; overflow:hidden;
+    background:linear-gradient(#08080a,#050506 60%,#060607); box-shadow:0 0 0 2px #000, 0 0 0 3px rgba(255,255,255,.04)}
+  .island{position:absolute; top:13px; left:50%; transform:translateX(-50%); width:118px; height:35px; background:#000; border-radius:19px; z-index:25;
+    box-shadow:0 0 0 .5px rgba(255,255,255,.05)}
+  .island::after{content:""; position:absolute; right:11px; top:50%; transform:translateY(-50%); width:9px; height:9px; border-radius:50%;
+    background:radial-gradient(circle at 60% 35%, #1d2740, #05060a 70%); box-shadow:0 0 0 1px rgba(255,255,255,.05)}
+  .statusbar{position:absolute; top:0; left:0; right:0; height:50px; z-index:20; display:flex; align-items:center; justify-content:space-between; padding:16px 26px 0; color:#fff}
+  .sb-time{font-family:-apple-system,'SF Pro Text',var(--en); font-weight:600; font-size:15px; letter-spacing:.2px}
+  .sb-icons{display:flex; align-items:center; gap:6px}
+  .sb-icons svg{display:block}
+  /* ---- focused "best card to pay" screen: the card is the animated hero (no spending widgets) ---- */
+  .app{position:absolute; top:50px; left:0; right:0; bottom:0; z-index:12; padding:14px 18px 16px;
+    display:flex; flex-direction:column; color:#ECECEE; font-family:var(--en)}
+  .appbar{text-align:center; line-height:1.2}
+  .ab-sub{display:block; font-size:11.5px; color:var(--muted); font-weight:500}
+  .ab-main{display:block; font-size:17px; font-weight:600; color:#fff; letter-spacing:-.01em; margin-top:1px}
+
+  .pick{position:relative; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; margin-top:8px}
+  .pick-tag{display:inline-flex; align-items:center; font-size:11px; font-weight:600; letter-spacing:.05em; color:var(--emerald)}
+
+  .pick-stage{position:relative; height:226px; margin-top:16px; display:grid; place-items:center; perspective:1000px}
+  .pick-glow{position:absolute; width:250px; height:200px; border-radius:50%; pointer-events:none; opacity:.7;
+    background:radial-gradient(closest-side, rgba(43,209,126,.34), transparent 70%); filter:blur(9px)}
+  .pick-card{position:relative; width:236px; transform-style:preserve-3d; border-radius:15px;
+    box-shadow:0 30px 56px -18px rgba(0,0,0,.9)}
+  .pick-card img{width:100%; display:block; border-radius:15px}
+  .pick-ring{position:absolute; inset:-6px; border-radius:20px; pointer-events:none;
+    border:1.5px solid rgba(43,209,126,.7); box-shadow:0 0 0 4px rgba(43,209,126,.08), 0 0 32px rgba(43,209,126,.36)}
+  .pick-sheen{position:absolute; inset:0; border-radius:15px; overflow:hidden; pointer-events:none}
+  .pick-sheen::after{content:""; position:absolute; top:-25%; bottom:-25%; left:0; width:52%;
+    background:linear-gradient(108deg, transparent, rgba(255,255,255,.24) 50%, transparent); transform:translateX(-190%) skewX(-9deg)}
+
+  .pick-earn{margin-top:26px}
+  .earn-label{font-size:11.5px; color:var(--muted)}
+  .earn-val{display:flex; align-items:baseline; justify-content:center; gap:7px; margin-top:4px}
+  .earn-num{font-size:37px; font-weight:700; color:var(--emerald); letter-spacing:-.025em; line-height:1}
+  .earn-unit{font-size:17px; font-weight:600; color:var(--emerald)}
+  .pick-why{display:inline-flex; align-items:center; gap:7px; margin-top:14px; padding:7px 13px; border-radius:999px;
+    background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08)}
+  .why-check{flex:none; width:16px; height:16px; border-radius:50%; display:grid; place-items:center; background:rgba(43,209,126,.18); color:var(--emerald); font-size:9px}
+  .why-text{font-size:11px; color:#c2c2c8; line-height:1.3}
+
+  .cats{display:flex; gap:7px}
+  .cat{flex:1; display:grid; place-items:center; height:40px; border-radius:12px; cursor:pointer; color:var(--faint); border:0;
+    background:rgba(255,255,255,.04); box-shadow:inset 0 0 0 1px rgba(255,255,255,.07); font-size:18px; transition:color .25s, background .25s, box-shadow .25s}
+  .cat:hover{color:var(--muted)}
+  .cat.active{color:var(--emerald); background:rgba(43,209,126,.14); box-shadow:inset 0 0 0 1px rgba(43,209,126,.42)}
+
+  /* motion: the card floats in 3D depth, the glow breathes, a sheen sweeps, the swap crossfades */
+  .pick-card.swap img{animation:cardSwap .42s ease}
+  .pick-earn.swap{animation:cardSwap .42s ease}
+  @media (prefers-reduced-motion: no-preference){
+    .pick-card{animation:hero-float 7s ease-in-out infinite}
+    .pick-glow{animation:hero-glow 5s ease-in-out infinite}
+    .pick-sheen::after{animation:hero-sheen 7.5s ease-in-out 1.6s infinite}
+  }
+  .home-ind{position:absolute; bottom:9px; left:50%; transform:translateX(-50%); width:128px; height:5px; border-radius:3px; background:rgba(255,255,255,.5); z-index:22}
+}
+
+/* ============================================================================
+   @scope — STEP 1 (add your cards) — verbatim from step1.html.
+   .panel demoted to a transparent positioning layer (the .hiw-frame draws the
+   card); .meta/.desc dropped (captions live in .hiw-cap).
+   ============================================================================ */
+@scope (.s1){
+  .panel{position:absolute; inset:0; background:none; border:0; box-shadow:none; border-radius:0; overflow:visible}
+  .panel::after{content:""; position:absolute; left:50%; bottom:70px; width:300px; height:90px; transform:translateX(-50%);
+    background:radial-gradient(closest-side, rgba(0,0,0,.55), transparent 72%); filter:blur(8px); pointer-events:none}
+  .scene{position:absolute; inset:0; perspective:1300px; perspective-origin:50% 38%}
+  .deck{position:absolute; left:50%; top:57%; width:0; height:0; transform-style:preserve-3d; animation:sway 9s ease-in-out infinite}
+  .card{position:absolute; left:-126px; top:-80px; width:252px; transform-style:preserve-3d;
+    transform:translateZ(var(--z)) translateY(var(--y)) rotateZ(var(--r)); filter:brightness(var(--b, 1)); border-radius:15px; overflow:hidden;
+    box-shadow:0 24px 40px -10px rgba(0,0,0,.6)}
+  .card img{width:100%; display:block; border-radius:15px; animation:rise .7s cubic-bezier(.32,1.2,.5,1) backwards; animation-delay:var(--d)}
+  .glare{position:absolute; inset:0; pointer-events:none; border-radius:15px; mix-blend-mode:screen;
+    background:linear-gradient(116deg, transparent 32%, rgba(255,255,255,.16) 47%, rgba(255,255,255,.04) 54%, transparent 67%);
+    transform:translateX(-120%); animation:sheen 6.5s ease-in-out 1.2s infinite}
+}
+
+/* ============================================================================
+   @scope — STEP 2 (double-click to pay) — from step2.html, RE-TUNED to a
+   portrait 480x470 stage (was landscape 520x440). Same visual: cropped onto the
+   side button + the iOS "Double Click to Pay" bar; the crop geometry (.zoom /
+   .ios-prompt) is re-fit for portrait.
+   ============================================================================ */
+@scope (.s2){
+  .panel{position:absolute; inset:0; background:none; border:0; box-shadow:none; border-radius:0; overflow:visible}
+  .zoom{position:absolute; left:-262px; top:-150px; transform:scale(1.7); transform-origin:top left}
+  .device{position:relative; width:calc(var(--screen-w) + 26px); height:calc(var(--screen-h) + 26px); border-radius:58px; padding:13px;
+    background:linear-gradient(145deg,#44444b 0%,#1b1b1e 26%,#101012 54%,#202024 78%,#3a3a40 100%)}
+  .btn-side{position:absolute; width:3px; border-radius:2px; background:linear-gradient(#2a2a2e,#141416)}
+  .btn-side.volup{left:-3px; top:166px; height:44px}
+  .btn-side.voldn{left:-3px; top:222px; height:44px}
+  .btn-side.power{right:-3px; top:196px; height:78px; background:linear-gradient(#2a2a2e,#141416)}
+  .screen{position:relative; width:var(--screen-w); height:var(--screen-h); border-radius:46px; overflow:hidden; background:linear-gradient(#0e0e12,#08080b)}
+  .sheet{position:absolute; left:7px; right:7px; top:150px; padding:12px 14px 20px; border-radius:30px;
+    background:rgba(16,16,20,.6); backdrop-filter:blur(30px) saturate(150%); border:1px solid rgba(255,255,255,.10)}
+  .grabber{width:36px; height:5px; border-radius:3px; background:rgba(255,255,255,.22); margin:0 auto 12px}
+  .sheet-card{position:relative; border-radius:13px; overflow:hidden; box-shadow:0 10px 24px rgba(0,0,0,.5)}
+  .sheet-card img{width:100%; display:block}
+  .best-tag{position:absolute; top:9px; left:9px; display:inline-flex; align-items:center; gap:4px; padding:4px 9px; border-radius:999px;
+    background:var(--emerald); color:#06160F; font-weight:700; font-size:10.5px}
+  .screen-dim{position:absolute; inset:0; z-index:4; pointer-events:none;
+    background:linear-gradient(90deg, rgba(8,8,11,.86), rgba(8,8,11,.92) 55%, rgba(8,8,11,.97))}
+  .ios-prompt{position:absolute; z-index:6; top:166px; right:148px; height:140px; display:flex; align-items:center; gap:16px}
+  .ios-prompt .lbl{font-size:20px; line-height:1.18; font-weight:600; color:#fff; text-align:right; letter-spacing:-.01em; text-shadow:0 2px 18px rgba(0,0,0,.7)}
+  .ios-bar{width:8px; height:100%; border-radius:5px; background:linear-gradient(180deg,#fff,#ededf2); box-shadow:0 0 16px 2px rgba(255,255,255,.4)}
+  @media (prefers-reduced-motion: no-preference){ .ios-bar{animation:barpulse 1.7s ease-in-out infinite} }
+}
+
+/* ============================================================================
+   @scope — STEP 3 (picks your best card) — verbatim from step3.html.
+   ============================================================================ */
+@scope (.s3){
+  .panel{position:absolute; inset:0; background:none; border:0; box-shadow:none; border-radius:0; overflow:visible}
+  .stack{position:absolute; left:50%; transform:translateX(-50%); top:0; width:256px; height:100%}
+  .glow{position:absolute; left:50%; top:120px; width:320px; height:200px; transform:translateX(-50%);
+    background:radial-gradient(closest-side, rgba(43,209,126,.26), rgba(43,209,126,0) 72%); opacity:.42; pointer-events:none}
+  .rest{position:absolute; left:8px; width:240px; z-index:1}
+  .rest .c{position:absolute; left:0; width:240px; border-radius:13px; overflow:hidden; filter:blur(.6px);
+    box-shadow:0 -1px 0 rgba(255,255,255,.05), 0 10px 20px rgba(0,0,0,.55)}
+  .rest .c img{width:100%; display:block}
+  .rest .c.c1{top:204px; z-index:1}
+  .rest .c.c2{top:248px; z-index:2}
+  .rest .c.c3{top:292px; z-index:3}
+  .rest .badge{position:absolute; top:9px; right:10px; padding:3px 8px; border-radius:7px;
+    background:rgba(20,20,23,.85); border:1px solid rgba(255,255,255,.12); color:#cdced2; font-size:11.5px; font-weight:600}
+  .best{position:absolute; left:3px; top:40px; width:250px; z-index:5}
+  .best .ring{position:absolute; inset:-5px; border-radius:19px; pointer-events:none; border:2px solid rgba(43,209,126,.92);
+    box-shadow:0 0 0 4px rgba(43,209,126,.10), 0 0 28px rgba(43,209,126,.30)}
+  .best img{width:100%; display:block; border-radius:14px; box-shadow:0 18px 38px rgba(0,0,0,.6)}
+  .best .reward{position:absolute; top:11px; right:11px; display:inline-flex; align-items:center; gap:5px; padding:5px 11px; border-radius:999px;
+    background:var(--emerald); color:#06160F; font-weight:700; font-size:13px; box-shadow:0 4px 12px rgba(0,0,0,.3)}
+  @media (prefers-reduced-motion: no-preference){
+    .best{animation:pick 7s var(--ease) infinite}
+    .best .ring{animation:ring-in 7s var(--ease) infinite}
+    .best .reward{animation:pill-in 7s var(--ease) infinite}
+    .rest .c{animation:recede 7s var(--ease) infinite}
+    .glow{animation:glow-in 7s var(--ease) infinite}
+  }
+}
+
+/* ============================================================================
+   @scope — STEP 4 (confirm & paid) — verbatim from step4.html.
+   ============================================================================ */
+@scope (.s4){
+  .panel{position:absolute; inset:0; background:none; border:0; box-shadow:none; border-radius:0; overflow:visible}
+  .ctx{position:absolute; top:0; left:0; right:0; padding:26px 30px 0; opacity:.5}
+  .ctx .m{display:flex; align-items:center; gap:10px}
+  .ctx .m .logo{height:34px; width:auto; display:block}
+  .ctx .item{display:flex; justify-content:space-between; align-items:center; margin-top:16px; color:#9a9aa0; font-size:13px}
+  .ctx .tot{display:flex; justify-content:space-between; align-items:baseline; margin-top:10px; padding-top:11px; border-top:1px solid rgba(255,255,255,.10); color:#8a8a90; font-size:13px}
+  .ctx .tot b{color:#e6e6e9; font-size:17px}
+  .sheet{position:absolute; left:8px; right:8px; bottom:8px; top:150px; padding:14px 18px 20px; border-radius:28px 28px 26px 26px;
+    background:rgba(15,15,19,.72); backdrop-filter:blur(34px) saturate(150%); -webkit-backdrop-filter:blur(34px) saturate(150%);
+    border:1px solid rgba(255,255,255,.10); box-shadow:inset 0 1px 0 rgba(255,255,255,.09), 0 -10px 40px rgba(0,0,0,.4); display:flex; flex-direction:column}
+  .grabber{width:38px; height:5px; border-radius:3px; background:rgba(255,255,255,.22); margin:0 auto 14px}
+  .card-row{display:flex; align-items:center; gap:13px}
+  .thumb{position:relative; width:96px; flex:none; border-radius:9px; overflow:hidden; box-shadow:0 6px 16px rgba(0,0,0,.5)}
+  .thumb img{width:100%; display:block}
+  .card-row .info .t{font-size:15px; font-weight:600}
+  .card-row .info .s{display:inline-flex; align-items:center; gap:5px; margin-top:4px; padding:3px 9px; border-radius:999px;
+    background:rgba(43,209,126,.16); border:1px solid rgba(43,209,126,.4); color:#86f0b6; font-size:11.5px; font-weight:700}
+  .amt{margin-left:auto; text-align:right}
+  .amt .l{font-size:11px; color:var(--muted)}
+  .amt .v{font-size:17px; font-weight:700}
+  .divider{height:1px; background:rgba(255,255,255,.08); margin:14px 0 13px}
+  .pay-row{display:flex; align-items:center; justify-content:space-between; padding:0 2px}
+  .pay-row .pl{font-size:13px; color:var(--muted)}
+  .pay-row .pv{display:inline-flex; align-items:center; gap:8px; font-size:13.5px; font-weight:600; color:#d4d4d9; letter-spacing:.02em}
+  .pay-row .net{font-size:10px; font-weight:800; letter-spacing:.09em; color:#a7a7af; padding:2px 6px; border-radius:5px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.10)}
+  .confirm{margin-top:auto; position:relative; display:flex; flex-direction:column; align-items:center; gap:5px; padding-bottom:16px}
+  .confirm::before{content:""; position:absolute; top:44px; left:50%; transform:translate(-50%,-50%); width:172px; height:172px; border-radius:50%;
+    background:radial-gradient(circle, rgba(43,209,126,.17), rgba(43,209,126,0) 66%); pointer-events:none}
+  .dc-glyph{position:relative; width:88px; height:88px; filter:hue-rotate(-72deg) saturate(1.18) brightness(1.06)}
+  .confirm .label{position:relative; font-size:15.5px; font-weight:600; color:#fff; letter-spacing:-.01em}
+  .confirm .label.flip{animation:lblflip .24s ease}
+}
+</style>
+</head>
+
+<body>
+<!-- ============================== NAV ============================== -->
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="#top" aria-label="AceWallet home">AceWallet</a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#how" data-en="How it works" data-ar="كيف يعمل">How it works</a>
+      <a href="#get" data-en="What you get" data-ar="ما الذي تحصل عليه">What you get</a>
+    </nav>
+    <div class="nav-right">
+      <button class="lang-btn" id="langBtn" type="button" aria-label="Switch language">العربية</button>
+      <a class="btn btn-primary btn-sm nav-cta" href="#join" data-en="Join the beta" data-ar="انضمّ إلى النسخة التجريبية">Join the beta</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <!-- ============================== HERO ============================== -->
+  <section class="hero">
+    <div class="hero-in">
+      <div class="hero-copy">
+        <h1 class="h1" data-reveal>
+          <span data-en="Apple Wallet shows your cards. We pick the best one." data-ar="‏Apple Wallet يعرض بطاقاتك. ونحن نختار الأفضل.">Apple Wallet shows your cards. We pick the best one.</span>
+        </h1>
+        <p class="hero-sub" data-reveal style="transition-delay:.06s">
+          <span data-en="Which card&rsquo;s best for " data-ar="أي بطاقة هي الأفضل لـ"></span><span class="rot" id="heroRot"></span><span data-en="? You&rsquo;re guessing. " data-ar="؟ أنت تخمّن. "></span><bdi>AceWallet</bdi><span data-en=" knows — and pays with it." data-ar=" يعرف — ويدفع بها."></span>
+        </p>
+        <form class="signup hero-form" data-reveal style="transition-delay:.12s" novalidate>
+          <div class="field">
+            <label class="sr-only" data-en="Email address" data-ar="البريد الإلكتروني">Email address</label>
+            <input type="email" name="email" autocomplete="email" inputmode="email" required
+                   data-ph-en="you@example.com" data-ph-ar="you@example.com" placeholder="you@example.com"
+                   data-aria-en="Email address" data-aria-ar="البريد الإلكتروني" aria-label="Email address" />
+          </div>
+          <button class="btn btn-primary" type="submit" data-en="Join the beta" data-ar="انضمّ إلى النسخة التجريبية">Join the beta</button>
+          <div class="form-foot" aria-live="polite">
+            <span class="micro" data-en="Free · no card details" data-ar="مجانًا · دون بيانات بطاقتك">Free · no card details</span>
+            <span class="msg"></span>
+          </div>
+        </form>
+      </div>
+
+      <div class="hero-visual" data-reveal style="transition-delay:.1s">
+        <!-- HERO MOCKUP — inlined from iphone.html (the "winning hand" pay sheet).
+             Re-localizes "Hold near reader" from <html lang> via its own observer. -->
+        <div class="hero-mock" dir="ltr">
+          <div class="device" role="img"
+               data-aria-en="Smart wallet app: the best card is selected for the chosen spend category."
+               data-aria-ar="تطبيق محفظة ذكية: تُختار أفضل بطاقة لفئة الإنفاق المحددة."
+               aria-label="Smart wallet app: the best card is selected for the chosen spend category.">
+            <span class="btn-side silent"></span><span class="btn-side volup"></span>
+            <span class="btn-side voldn"></span><span class="btn-side power"></span>
+            <div class="screen">
+              <div class="statusbar">
+                <span class="sb-time">9:41</span>
+                <span class="sb-icons">
+                  <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor" aria-hidden="true">
+                    <rect x="0" y="7.5" width="3.2" height="4.5" rx="1"/><rect x="4.93" y="5" width="3.2" height="7" rx="1"/>
+                    <rect x="9.86" y="2.5" width="3.2" height="9.5" rx="1"/><rect x="14.8" y="0" width="3.2" height="12" rx="1"/>
+                  </svg>
+                  <svg width="16" height="12" viewBox="0 0 16 11" fill="currentColor" aria-hidden="true">
+                    <path d="M8 0C4.9 0 2.06 1.05 0 2.8l1.2 1.4C2.96 2.7 5.36 1.8 8 1.8s5.04.9 6.8 2.4L16 2.8C13.94 1.05 11.1 0 8 0z"/>
+                    <path d="M8 3.7c-2.1 0-4.02.74-5.5 1.98l1.22 1.43A6.6 6.6 0 0 1 8 5.5c1.66 0 3.18.6 4.28 1.6l1.22-1.42A8.5 8.5 0 0 0 8 3.7z"/>
+                    <path d="M8 7.4c-1.1 0-2.1.4-2.86 1.06L8 11l2.86-2.54A4.3 4.3 0 0 0 8 7.4z"/>
+                  </svg>
+                  <svg width="25" height="12" viewBox="0 0 25 12" fill="none" aria-hidden="true">
+                    <rect x="0.6" y="0.6" width="21" height="10.8" rx="2.7" stroke="currentColor" stroke-opacity=".45"/>
+                    <rect x="2" y="2" width="15.6" height="8" rx="1.6" fill="currentColor"/>
+                    <path d="M23.3 4.1c.95.26.95 3.54 0 3.8z" fill="currentColor" fill-opacity=".5"/>
+                  </svg>
+                </span>
+              </div>
+              <div class="island"></div>
+              <div class="app">
+                <div class="appbar">
+                  <span class="ab-sub" id="abSub">Best card to use</span>
+                  <span class="ab-main" id="abMain">Right now</span>
+                </div>
+                <div class="pick">
+                  <span class="pick-tag"><span id="pickTag">Smart pick</span></span>
+                  <div class="pick-stage">
+                    <span class="pick-glow"></span>
+                    <div class="pick-card" id="pickCard">
+                      <img id="pickImg" src="cards/sab-cashback.png" alt="Best card for the selected category" />
+                      <span class="pick-ring"></span>
+                      <span class="pick-sheen"></span>
+                    </div>
+                  </div>
+                  <div class="pick-earn" id="pickEarn">
+                    <div class="earn-label" id="earnLabel">You&rsquo;ll earn</div>
+                    <div class="earn-val"><b class="earn-num" id="earnNum">+5%</b><span class="earn-unit" id="earnUnit">cashback</span></div>
+                  </div>
+                  <div class="pick-why">
+                    <span class="why-check" aria-hidden="true"><i class="ph-bold ph-check"></i></span>
+                    <span class="why-text" id="whyText">Higher rewards than your other cards on Coffee</span>
+                  </div>
+                </div>
+                <div class="cats" id="catRow">
+                  <button class="cat active" data-cat="coffee"    aria-label="Coffee"><i class="ph ph-coffee"></i></button>
+                  <button class="cat"        data-cat="dining"    aria-label="Dining"><i class="ph ph-fork-knife"></i></button>
+                  <button class="cat"        data-cat="groceries" aria-label="Groceries"><i class="ph ph-shopping-cart"></i></button>
+                  <button class="cat"        data-cat="fuel"      aria-label="Fuel"><i class="ph ph-gas-pump"></i></button>
+                  <button class="cat"        data-cat="online"    aria-label="Online"><i class="ph ph-shopping-bag"></i></button>
+                  <button class="cat"        data-cat="flights"   aria-label="Flights"><i class="ph ph-airplane-tilt"></i></button>
+                </div>
+              </div>
+              <div class="home-ind"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== HOW IT WORKS ============================== -->
+  <section class="sec" id="how">
+    <div class="wrap">
+      <div class="sec-head" data-reveal>
+        <span class="sec-kicker" data-en="How it works" data-ar="كيف يعمل">How it works</span>
+        <h2 class="sec-title" data-en="Pay like you always do." data-ar="ادفع كما تفعل دائمًا.">Pay like you always do.</h2>
+      </div>
+
+      <div class="hiw-grid">
+        <!-- 01 -->
+        <article class="hiw" data-reveal style="--i:0; transition-delay:0ms">
+          <div class="hiw-frame" role="img" data-aria-en="Add your cards: your real cards fan into the wallet." data-aria-ar="أضِف بطاقاتك: بطاقاتك الحقيقية تنضمّ إلى المحفظة." aria-label="Add your cards">
+            <div class="hiw-stage s1">
+              <div class="panel">
+                <div class="scene">
+                  <div class="deck">
+                    <div class="card" style="--z:-176px; --y:-120px; --r:-6deg;  --b:.62; --d:0s">  <img src="cards/ajb-premium.png" alt="" loading="lazy" decoding="async" /></div>
+                    <div class="card" style="--z:-132px; --y:-90px;  --r:-4.5deg;--b:.72; --d:.08s"><img src="cards/alfursan.png" alt="" loading="lazy" decoding="async" /></div>
+                    <div class="card" style="--z:-88px;  --y:-60px;  --r:-3deg;  --b:.84; --d:.16s"><img src="cards/sab-cashback.png" alt="" loading="lazy" decoding="async" /></div>
+                    <div class="card" style="--z:-44px;  --y:-30px;  --r:-1.5deg;--b:.93; --d:.24s"><img src="cards/alrajhi-salaries.png" alt="" loading="lazy" decoding="async" /></div>
+                    <div class="card" style="--z:0px;    --y:0px;    --r:0deg;   --b:1;   --d:.32s"><img src="cards/private-infinite.png" alt="A card you already carry" loading="lazy" decoding="async" /><span class="glare"></span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="hiw-cap">
+            <div class="row"><span class="num">01</span><h3 data-en="Add your cards" data-ar="أضِف بطاقاتك">Add your cards</h3></div>
+            <p data-en="Add the cards you already carry — AceWallet instantly learns each one&rsquo;s cashback, points, and perks."
+               data-ar="أضِف بطاقاتك بأمان. يعرف AceWallet فورًا ما تقدّمه كل بطاقة من كاش باك ونقاط وفئات مكافآت ومزايا.">Add the cards you already carry — AceWallet instantly learns each one&rsquo;s cashback, points, and perks.</p>
+          </div>
+        </article>
+
+        <!-- 02 -->
+        <article class="hiw" data-reveal style="--i:1; transition-delay:80ms">
+          <div class="hiw-frame" role="img" data-aria-en="Double-click to pay: the iPhone side button." data-aria-ar="اضغط مرّتين للدفع: الزر الجانبي للآيفون." aria-label="Double-click to pay">
+            <div class="hiw-stage s2">
+              <div class="panel">
+                <div class="zoom">
+                  <div class="device">
+                    <span class="btn-side volup"></span><span class="btn-side voldn"></span><span class="btn-side power"></span>
+                    <div class="screen">
+                      <div class="sheet">
+                        <div class="grabber"></div>
+                        <div class="sheet-card">
+                          <img src="cards/sab-cashback.png" alt="" loading="lazy" decoding="async" />
+                          <span class="best-tag">Best for coffee · +5%</span>
+                        </div>
+                      </div>
+                      <div class="screen-dim"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="ios-prompt">
+                  <span class="lbl" data-en="Double Click<br>to Pay" data-ar="اضغط مرّتين<br>للدفع">Double Click<br>to Pay</span>
+                  <span class="ios-bar"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="hiw-cap">
+            <div class="row"><span class="num">02</span><h3 data-en="Double-click to pay" data-ar="اضغط مرّتين للدفع">Double-click to pay</h3></div>
+            <p data-en="The same gesture you already use." data-ar="بالحركة نفسها التي اعتدتها.">The same gesture you already use.</p>
+          </div>
+        </article>
+
+        <!-- 03 -->
+        <article class="hiw" data-reveal style="--i:2; transition-delay:160ms">
+          <div class="hiw-frame" role="img" data-aria-en="AceWallet picks your best card: the winner rises with an emerald ring." data-aria-ar="يختار AceWallet أفضل بطاقة: ترتفع البطاقة الفائزة بحلقة زمردية." aria-label="AceWallet picks your best card">
+            <div class="hiw-stage s3">
+              <div class="panel">
+                <div class="stack">
+                  <div class="glow"></div>
+                  <div class="rest">
+                    <div class="c c1"><img src="cards/sab-premier.png" alt="" loading="lazy" decoding="async" /><span class="badge">+2%</span></div>
+                    <div class="c c2"><img src="cards/ajb-premium.png" alt="" loading="lazy" decoding="async" /><span class="badge">+1%</span></div>
+                    <div class="c c3"><img src="cards/alfursan.png" alt="" loading="lazy" decoding="async" /><span class="badge">1&times;</span></div>
+                  </div>
+                  <div class="best">
+                    <div class="ring"></div>
+                    <img src="cards/sab-cashback.png" alt="The winning card" loading="lazy" decoding="async" />
+                    <span class="reward">&#9749; +5%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="hiw-cap">
+            <div class="row"><span class="num">03</span><h3 data-en="AceWallet picks your best card" data-ar="نختار بطاقتك الأفضل">AceWallet picks your best card</h3></div>
+            <p data-en="No checking, no swiping — it already knows which of your cards earns the most, and lifts it to the front."
+               data-ar="يدفع AceWallet بالبطاقة التي تربح بها أكثر في تلك العملية — تلقائيًا، في كل مرة.">No checking, no swiping — it already knows which of your cards earns the most, and lifts it to the front.</p>
+          </div>
+        </article>
+
+        <!-- 04 -->
+        <article class="hiw" data-reveal style="--i:3; transition-delay:240ms">
+          <div class="hiw-frame" role="img" data-aria-en="Confirm and it&rsquo;s paid: the AceWallet pay sheet completes." data-aria-ar="أكِّد وتمّ الدفع: تكتمل عملية الدفع في AceWallet." aria-label="Confirm and it is paid">
+            <div class="hiw-stage s4">
+              <div class="panel">
+                <div class="ctx">
+                  <div class="m"><img class="logo" src="assets/barns-white.png" alt="Barn's" loading="lazy" decoding="async" /></div>
+                  <div class="item"><span>1 &times; Flat White</span><span>SAR 18.00</span></div>
+                  <div class="tot"><span data-en="Total" data-ar="الإجمالي">Total</span><b>SAR 18.00</b></div>
+                </div>
+                <div class="sheet">
+                  <div class="grabber"></div>
+                  <div class="card-row">
+                    <div class="thumb"><img src="cards/sab-cashback.png" alt="" loading="lazy" decoding="async" /></div>
+                    <div class="info">
+                      <div class="t">AceWallet</div>
+                      <span class="s">&#9749; Best for coffee · +5%</span>
+                    </div>
+                    <div class="amt"><div class="l" data-en="Pay" data-ar="ادفع">Pay</div><div class="v">SAR 18.00</div></div>
+                  </div>
+                  <div class="divider"></div>
+                  <div class="pay-row">
+                    <span class="pl" data-en="Payment" data-ar="الدفع">Payment</span>
+                    <span class="pv"><span class="net">VISA</span> &bull;&bull;&bull;&bull; 4291</span>
+                  </div>
+                  <div class="confirm">
+                    <dotlottie-player id="dc" class="dc-glyph" src="assets/double-click.lottie" autoplay loop></dotlottie-player>
+                    <span class="label" id="payLabel">Confirm with Side Button</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="hiw-cap">
+            <div class="row"><span class="num">04</span><h3 data-en="Confirm, and it&rsquo;s paid" data-ar="أكِّد، وتمّ الدفع">Confirm, and it&rsquo;s paid</h3></div>
+            <p data-en="A glance or a press of the side button authorizes it — done, with the best card."
+               data-ar="نظرة أو ضغطة على الزر الجانبي تؤكّد العملية — وتمّ الدفع بأفضل بطاقة.">A glance or a press of the side button authorizes it — done, with the best card.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== WHAT YOU GET ============================== -->
+  <section class="sec" id="get">
+    <div class="wrap">
+      <div class="sec-head" data-reveal>
+        <span class="sec-kicker" data-en="What you get" data-ar="ما الذي تحصل عليه">What you get</span>
+        <h2 class="sec-title"><span data-en="Earn more " data-ar="اكسب المزيد من "></span><span class="rot" id="getRot"></span><span data-en="." data-ar=".">.</span></h2>
+        <p class="sec-sub" data-en="On the cards you already carry — no new card, no new account." data-ar="على البطاقات التي تحملها أصلًا — دون بطاقة جديدة أو حساب جديد.">On the cards you already carry — no new card, no new account.</p>
+      </div>
+
+      <div class="wyg-grid">
+        <article class="wyg-card best" data-reveal>
+          <span class="glow-border" aria-hidden="true"></span>
+          <h3 data-en="Never miss the highest reward." data-ar="لا تفوّت أعلى مكافأة.">Never miss the highest reward.</h3>
+          <p data-en="Every purchase goes on the card that pays the most — more cashback, more points, without tracking a thing."
+             data-ar="تُدفع كل عملية بالبطاقة التي تمنحك الأكثر — كاش باك أكثر ونقاط أكثر، دون أن تتابع شيئًا.">Every purchase goes on the card that pays the most — more cashback, more points, without tracking a thing.</p>
+          <div class="wyg-visual" aria-hidden="true">
+            <div class="rack" id="rack">
+              <div class="rack-intent">
+                <span class="ri-for" data-en="Best for" data-ar="الأفضل لـ">Best for</span>
+                <span class="ri-cat"><i class="ph ph-coffee" id="rackIcon"></i><span class="ri-lbl">Coffee</span></span>
+              </div>
+              <div class="rack-list">
+                <div class="rk win" data-card="cashback" style="top:0px"><img src="cards/sab-cashback.png" alt="" loading="lazy" /><span class="rk-rate"><b class="rk-num">+5%</b></span></div>
+                <div class="rk" data-card="premier" style="top:44px"><img src="cards/sab-premier.png" alt="" loading="lazy" /><span class="rk-rate"><b class="rk-num">+2%</b></span></div>
+                <div class="rk" data-card="ajb" style="top:88px"><img src="cards/ajb-premium.png" alt="" loading="lazy" /><span class="rk-rate"><b class="rk-num">+1%</b></span></div>
+                <div class="rk" data-card="fursan" style="top:132px"><img src="cards/alfursan.png" alt="" loading="lazy" /><span class="rk-rate"><b class="rk-num">1&times;</b></span></div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="wyg-card" data-reveal style="transition-delay:.08s">
+          <span class="glow-border" aria-hidden="true"></span>
+          <h3 data-en="No new card, no new account." data-ar="لا بطاقة جديدة، ولا حساب جديد.">No new card, no new account.</h3>
+          <p data-en="AceWallet works with the cards already in your wallet — nothing to apply for, nothing to switch."
+             data-ar="يعمل AceWallet مع البطاقات الموجودة في محفظتك — لا شيء تتقدّم له، ولا شيء تبدّله.">AceWallet works with the cards already in your wallet — nothing to apply for, nothing to switch.</p>
+          <div class="wyg-visual" aria-hidden="true">
+            <div class="fan">
+              <div class="fc fc0"><img src="cards/sab-premier.png" alt="" loading="lazy" /></div>
+              <div class="fc fc1"><img src="cards/alfursan.png" alt="" loading="lazy" /></div>
+              <div class="fc fc2"><img src="cards/private-infinite.png" alt="" loading="lazy" /></div>
+              <div class="fc fc3"><img src="cards/ajb-premium.png" alt="" loading="lazy" /></div>
+              <div class="fc fc4"><img src="cards/alrajhi-salaries.png" alt="" loading="lazy" /></div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== WAITLIST CLOSER ============================== -->
+  <section class="closer" id="join">
+    <div class="closer-in">
+      <h2 class="closer-line" data-reveal>
+        <span data-en="Always play your " data-ar="الْعَب "></span><span class="ace" data-en="ace" data-ar="الآس">ace</span><span data-en="." data-ar=" دائمًا.">.</span>
+      </h2>
+      <p data-reveal style="transition-delay:.06s" data-en="Stop leaving rewards on the table — ace every purchase."
+         data-ar="لا تترك مكافآتك على الطاولة — اكسب الأكثر من كل عملية شراء.">Stop leaving rewards on the table — ace every purchase.</p>
+      <form class="signup" data-reveal style="transition-delay:.12s" novalidate>
+        <div class="field">
+          <label class="sr-only" data-en="Email address" data-ar="البريد الإلكتروني">Email address</label>
+          <input type="email" name="email" autocomplete="email" inputmode="email" required
+                 data-ph-en="you@example.com" data-ph-ar="you@example.com" placeholder="you@example.com"
+                 data-aria-en="Email address" data-aria-ar="البريد الإلكتروني" aria-label="Email address" />
+        </div>
+        <button class="btn btn-primary" type="submit" data-en="Join the beta" data-ar="انضمّ إلى النسخة التجريبية">Join the beta</button>
+        <div class="form-foot" aria-live="polite">
+          <span class="micro" data-en="Free to join · no card details needed · launching soon."
+                data-ar="الانضمام مجاني · دون بيانات بطاقتك · ننطلق قريبًا.">Free to join · no card details needed · launching soon.</span>
+          <span class="msg"></span>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<!-- ============================== FOOTER ============================== -->
+<footer class="foot">
+  <div class="foot-in">
+    <a class="brand" href="#top" aria-label="AceWallet home">AceWallet</a>
+    <nav class="foot-nav" aria-label="Footer">
+      <a href="#how" data-en="How it works" data-ar="كيف يعمل">How it works</a>
+      <a href="#get" data-en="What you get" data-ar="ما الذي تحصل عليه">What you get</a>
+      <a href="#join" data-en="Privacy" data-ar="الخصوصية">Privacy</a>
+    </nav>
+    <span class="tag" data-en="Always play your ace." data-ar="الْعَب الآس دائمًا.">Always play your ace.</span>
+  </div>
+</footer>
+
+<script>
+/* ============================================================================
+   PAGE JS — bilingual swap, width-morph rotators, scroll reveal, form states,
+   and the responsive scaling of the how-it-works panels. Plus the inlined hero
+   rotation IIFE (from iphone.html) and the step-4 label sync (from step4.html).
+   ============================================================================ */
+(function(){
+  "use strict";
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var root = document.documentElement;
+  var lang = (root.lang === 'ar') ? 'ar' : 'en';
+
+  /* ---- localized strings authored for non-copy UI (form states) ---- */
+  var UI = {
+    formOk:  { en:"You’re on the list. We’ll be in touch.", ar:"أنت على القائمة. سنتواصل معك قريبًا." },
+    formErr: { en:"Please enter a valid email.",                     ar:"فضلاً أدخل بريدًا إلكترونيًا صحيحًا." },
+    langLabel:{ en:"العربية", ar:"English" }   /* the toggle shows the OTHER language */
+  };
+
+  /* ---- rotating words (locked copy, EN + AR) ---- */
+  var ROT = {
+    hero:{ en:["coffee","groceries","dining","fuel","flights","online shopping"],
+           ar:["القهوة","البقالة","المطاعم","الوقود","الرحلات","التسوّق الإلكتروني"] },
+    get: { en:["cashback","points","miles","rewards"],
+           ar:["الكاش باك","النقاط","الأميال","المكافآت"] }
+  };
+
+  /* ===================== bilingual swap ===================== */
+  function applyLang(next){
+    lang = next;
+    root.lang = lang;
+    root.dir  = (lang === 'ar') ? 'rtl' : 'ltr';
+
+    document.querySelectorAll('[data-en]').forEach(function(el){
+      var v = el.getAttribute('data-' + lang);
+      if(v == null) return;
+      if(/<br\s*\/?>/i.test(v)) el.innerHTML = v;   // a couple of strings carry a <br>
+      else el.textContent = v;
+    });
+    document.querySelectorAll('[data-ph-en]').forEach(function(el){
+      el.placeholder = el.getAttribute('data-ph-' + lang) || '';
+    });
+    document.querySelectorAll('[data-aria-en]').forEach(function(el){
+      el.setAttribute('aria-label', el.getAttribute('data-aria-' + lang) || '');
+    });
+
+    langBtn.textContent = UI.langLabel[lang];
+    langBtn.setAttribute('aria-label', lang === 'ar' ? 'التبديل إلى الإنجليزية' : 'Switch to Arabic');
+
+    // clear any visible form messages (their language would otherwise be stale)
+    document.querySelectorAll('.form-foot .msg').forEach(function(m){ m.textContent=''; m.className='msg'; });
+    document.querySelectorAll('.form-foot .micro').forEach(function(m){ m.style.opacity=''; });
+
+    rotators.forEach(function(r){ r.refresh(); });
+  }
+
+  var langBtn = document.getElementById('langBtn');
+  langBtn.addEventListener('click', function(){ applyLang(lang === 'ar' ? 'en' : 'ar'); });
+
+  /* ===================== rotating word (crossfade + resize-while-hidden) =====================
+     The jank was the slot resizing while the new word was visible: a long word (e.g. "online
+     shopping") overflowed its still-narrow box and collided with the text after it. Fix: fade the
+     word OUT, resize the slot while it's invisible (so the trailing sentence just glides, nothing to
+     collide with), then fade the new word back IN at the settled width. Width is measured off a
+     hidden twin that copies the rot's exact font metrics (per-property, not the `font` shorthand). */
+  function makeRotator(el, key, interval){
+    var inner = document.createElement('i');
+    el.appendChild(inner);
+    var meas = document.createElement('span');
+    meas.setAttribute('aria-hidden','true');
+    meas.style.cssText = 'position:absolute;left:-9999px;top:0;white-space:nowrap;pointer-events:none;visibility:hidden';
+    el.appendChild(meas);
+    var i = 0, timer = null, timers = [];
+
+    function words(){ return ROT[key][lang]; }
+    function syncFont(){
+      var cs = getComputedStyle(el);
+      ['fontStyle','fontWeight','fontSize','fontFamily','letterSpacing','textTransform'].forEach(function(p){ meas.style[p] = cs[p]; });
+    }
+    function widthOf(t){ meas.textContent = t; return meas.getBoundingClientRect().width; }
+    function place(t){ inner.textContent = t; el.style.width = widthOf(t) + 'px'; }
+    function clearT(){ timers.forEach(clearTimeout); timers = []; }
+    function show(next, animate){
+      clearT();
+      if(reduce || !animate){ el.classList.remove('is-out'); place(next); return; }
+      el.classList.add('is-out');                               // fade the current word out (.2s)
+      timers.push(setTimeout(function(){
+        inner.textContent = next;                               // swap text while invisible
+        el.style.width = widthOf(next) + 'px';                  // resize slot -> trailing text glides (.34s), nothing to collide with
+        timers.push(setTimeout(function(){
+          el.classList.remove('is-out');                        // fade the new word back in at the settled width
+        }, 300));
+      }, 230));
+    }
+    function tick(){ var w = words(); i = (i + 1) % w.length; show(w[i], true); }
+    function start(){ stop(); if(!reduce) timer = setInterval(tick, interval); }
+    function stop(){ if(timer){ clearInterval(timer); timer = null; } clearT(); }
+
+    syncFont();
+    place(words()[i % words().length]);
+    start();
+
+    return { refresh:function(){ stop(); el.classList.remove('is-out'); syncFont(); i = i % words().length; place(words()[i]); start(); } };
+  }
+
+  var rotators = [];
+  rotators.push(makeRotator(document.getElementById('heroRot'), 'hero', 2400));
+  rotators.push(makeRotator(document.getElementById('getRot'),  'get',  2200));
+
+  /* ===================== scroll reveal ===================== */
+  if('IntersectionObserver' in window && !reduce){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold:0.16, rootMargin:'0px 0px -8% 0px' });
+    document.querySelectorAll('[data-reveal]').forEach(function(el){ io.observe(el); });
+  } else {
+    document.querySelectorAll('[data-reveal]').forEach(function(el){ el.classList.add('in'); });
+  }
+
+  /* ===================== beta signup form ===================== */
+  var EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  document.querySelectorAll('form.signup').forEach(function(form){
+    var input = form.querySelector('input[type="email"]');
+    var msg   = form.querySelector('.msg');
+    var micro = form.querySelector('.micro');
+    function setMsg(kind, text){
+      msg.textContent = text; msg.className = 'msg ' + kind;
+      if(micro) micro.style.opacity = text ? '0' : '';   // swap microcopy for the status line
+    }
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var val = (input.value || '').trim();
+      if(!EMAIL.test(val)){
+        input.classList.add('invalid'); setMsg('err', UI.formErr[lang]); input.focus(); return;
+      }
+      input.classList.remove('invalid');
+      // No backend yet — validate client-side and confirm. Wire to Formspree/Supabase later.
+      setMsg('ok', UI.formOk[lang]);
+      form.reset();
+    });
+    input.addEventListener('input', function(){
+      if(input.classList.contains('invalid')){ input.classList.remove('invalid'); setMsg('', ''); }
+    });
+  });
+
+  /* ===================== how-it-works panel scaling ===================== */
+  // Each .hiw-stage is authored at 480x470; scale it to fill its responsive frame.
+  function scaleStages(){
+    document.querySelectorAll('.hiw-stage').forEach(function(st){
+      var w = st.parentNode.clientWidth;
+      if(w) st.style.transform = 'scale(' + (w / 480) + ')';
+    });
+  }
+  scaleStages();
+  if('ResizeObserver' in window){
+    var ro = new ResizeObserver(scaleStages);
+    document.querySelectorAll('.hiw-frame').forEach(function(f){ ro.observe(f); });
+  }
+  window.addEventListener('resize', scaleStages);
+  window.addEventListener('load', scaleStages);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ scaleStages(); rotators.forEach(function(r){ r.refresh(); }); });
+
+  /* init */
+  applyLang(lang);
+})();
+</script>
+
+<script>
+/* ============================================================================
+   HERO rotation — inlined verbatim from iphone.html. Rotates the spend category
+   every 2.4s and lifts the best card; follows <html lang> via a MutationObserver.
+   ============================================================================ */
+(function(){
+  "use strict";
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var still  = /[?&]still\b/.test(location.search);
+
+  var $ = function(id){ return document.getElementById(id); };
+  var qsa = function(s){ return Array.prototype.slice.call(document.querySelectorAll(s)); };
+
+  var CARDS = {
+    cashback:{ src:'cards/sab-cashback.png', net:'VISA' },
+    premier: { src:'cards/sab-premier.png',  net:'Mastercard' },
+    ajb:     { src:'cards/ajb-premium.png',  net:'VISA' },
+    fursan:  { src:'cards/alfursan.png',     net:'VISA' }
+  };
+  var ORDER = ['coffee','dining','groceries','fuel','online','flights'];
+  var BEST = {
+    coffee:    [['cashback','5%'],['premier','2%'],['ajb','1%'],['fursan','1×']],
+    dining:    [['premier','4%'],['cashback','3%'],['fursan','2×'],['ajb','1%']],
+    groceries: [['ajb','3%'],['cashback','2%'],['premier','1%'],['fursan','1×']],
+    fuel:      [['cashback','6%'],['ajb','2%'],['premier','1%'],['fursan','1×']],
+    online:    [['premier','3%'],['cashback','3%'],['ajb','1%'],['fursan','1×']],
+    flights:   [['fursan','3×'],['premier','2×'],['cashback','1%'],['ajb','1%']]
+  };
+  var CAT_LABEL = {
+    coffee:{en:'Coffee',ar:'القهوة'}, dining:{en:'Dining',ar:'المطاعم'}, groceries:{en:'Groceries',ar:'البقالة'},
+    fuel:{en:'Fuel',ar:'الوقود'}, online:{en:'Online',ar:'التسوّق الإلكتروني'}, flights:{en:'Flights',ar:'الرحلات'}
+  };
+  /* app-UI labels (localized; not marketing copy) */
+  var STR = {
+    abSub:{en:'Best card to use',ar:'أفضل بطاقة للدفع'}, abMain:{en:'Right now',ar:'الآن'},
+    pickTag:{en:'Smart pick',ar:'اختيار ذكي'}, earnLabel:{en:'You’ll earn',ar:'ستكسب'},
+    cashback:{en:'cashback',ar:'كاش باك'}, miles:{en:'miles',ar:'أميال'},
+    whyTpl:{en:'Higher rewards than your other cards on ',ar:'مكافآت أعلى من بطاقاتك الأخرى على '},
+    stLbl1:{en:'This month',ar:'هذا الشهر'}, stLbl2:{en:'Rewards earned',ar:'المكافآت'},
+    othersLbl:{en:'Other cards',ar:'بطاقات أخرى'}, manageLbl:{en:'Manage your cards',ar:'إدارة بطاقاتك'}
+  };
+
+  var pickImg=$('pickImg'), pickCard=$('pickCard'), earnNum=$('earnNum'), earnUnit=$('earnUnit'),
+      pickEarn=$('pickEarn'), whyText=$('whyText');
+  if(!pickImg) return;
+  var catBtns = qsa('#catRow .cat');
+  var LBL = { abSub:$('abSub'), abMain:$('abMain'), pickTag:$('pickTag'), earnLabel:$('earnLabel') };
+
+  Object.keys(CARDS).forEach(function(k){ var im=new Image(); im.src=CARDS[k].src; });
+
+  var lang=(document.documentElement.lang==='ar')?'ar':'en', idx=0, playing=!reduce && !still, timer=null;
+
+  function fmt(v){ return /%$/.test(v) ? '+'+v : v; }                 // "5%"->"+5%", "3×" stays
+  function unitFor(v){ return /×$/.test(v) ? STR.miles[lang] : STR.cashback[lang]; }
+  function retrigger(el, cls){ el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+  function paint(catId){
+    var rows = BEST[catId], win = rows[0];
+    pickImg.src      = CARDS[win[0]].src;
+    earnNum.textContent = fmt(win[1]);
+    earnUnit.textContent= unitFor(win[1]);
+    whyText.textContent = STR.whyTpl[lang] + CAT_LABEL[catId][lang];
+    catBtns.forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-cat')===catId); });
+  }
+  function render(catId, animate){
+    paint(catId);
+    if(animate){ retrigger(pickCard,'swap'); retrigger(pickEarn,'swap'); }
+  }
+  function tick(){ idx=(idx+1)%ORDER.length; render(ORDER[idx], true); }
+  function startTimer(){ stopTimer(); if(playing && !reduce){ timer=setInterval(tick, 3000); } }
+  function stopTimer(){ if(timer){ clearInterval(timer); timer=null; } }
+  function applyLang(){
+    Object.keys(LBL).forEach(function(k){ if(LBL[k]) LBL[k].textContent = STR[k][lang]; });
+    paint(ORDER[idx]);                                                // refresh unit + why in the new language
+  }
+
+  catBtns.forEach(function(b){ b.addEventListener('click', function(){
+    idx=ORDER.indexOf(b.getAttribute('data-cat')); render(ORDER[idx], true); if(playing) startTimer();
+  }); });
+
+  new MutationObserver(function(){
+    var l=(document.documentElement.lang==='ar')?'ar':'en';
+    if(l!==lang){ lang=l; applyLang(); }
+  }).observe(document.documentElement, {attributes:true, attributeFilter:['lang']});
+
+  render(ORDER[0], false);
+  applyLang();
+  startTimer();
+})();
+</script>
+
+<script type="module">
+/* ============================================================================
+   STEP-4 label sync — inlined verbatim from step4.html. The label tracks the
+   confirm glyph's beats: press -> "Confirm with Side Button"; scan ->
+   "Processing Payment"; check -> "Done".
+   ============================================================================ */
+const player = document.getElementById('dc');
+const label  = document.getElementById('payLabel');
+if(player && label){
+  const labelFor = (f) => f >= 80 ? 'Done' : (f >= 33 ? 'Processing Payment' : 'Confirm with Side Button');
+  let cur = '';
+  function setText(t){
+    if(t === cur) return;
+    cur = t; label.textContent = t;
+    label.classList.remove('flip'); void label.offsetWidth; label.classList.add('flip');
+  }
+  let wired = false;
+  function wire(){
+    const l = player && player.getLottie && player.getLottie();
+    if(!l || !l.totalFrames) return false;
+    if(wired) return true;
+    wired = true;
+    l.addEventListener('enterFrame', () => setText(labelFor(l.currentFrame)));
+    return true;
+  }
+  player.addEventListener('ready', wire);
+  let tries = 0;
+  const ivPoll = setInterval(() => { if(wire() || ++tries > 50) clearInterval(ivPoll); }, 80);
+}
+</script>
+
+<script>
+/* ============================================================================
+   "What you get" — Card 1 live best-card RE-SORT + cursor edge-glow on both cards.
+   Research-led: Pointer/CardPointers card ranking · Family/FLIP rise-to-top ·
+   Robinhood odometer (up = emerald). Emerald is applied ONLY to the winning row
+   and its number — every other state stays neutral.
+   ============================================================================ */
+(function(){
+  "use strict";
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- cursor-follow edge glow on both feature cards (lights the border, not the face) ---- */
+  if(!reduce){
+    document.querySelectorAll('.wyg-card').forEach(function(card){
+      card.addEventListener('pointermove', function(e){
+        var r = card.getBoundingClientRect();
+        card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+        card.style.setProperty('--my', (e.clientY - r.top)  + 'px');
+      });
+    });
+  }
+
+  /* ---- Card 1: rank the real cards for the current spend, rise the winner to the top ---- */
+  var rack = document.getElementById('rack');
+  if(!rack || reduce) return;   // reduced-motion rests on the resolved frame already in the HTML
+  var intent = rack.querySelector('.rack-intent');
+  var icon   = document.getElementById('rackIcon');
+  var lbl    = rack.querySelector('.ri-lbl');
+  var rows   = {};
+  Array.prototype.forEach.call(rack.querySelectorAll('.rk'), function(el){ rows[el.getAttribute('data-card')] = el; });
+
+  /* spend categories → the same winning-hand logic as the hero (a different card wins each) */
+  var CATS = [
+    {icon:'ph-coffee',        en:'Coffee',    ar:'القهوة',  rank:[['cashback','+5%'],['premier','+2%'],['ajb','+1%'],['fursan','1×']]},
+    {icon:'ph-shopping-cart', en:'Groceries', ar:'البقالة', rank:[['ajb','+3%'],['cashback','+2%'],['premier','+1%'],['fursan','1×']]},
+    {icon:'ph-fork-knife',    en:'Dining',    ar:'المطاعم', rank:[['premier','+4%'],['cashback','+3%'],['fursan','2×'],['ajb','+1%']]},
+    {icon:'ph-airplane-tilt', en:'Flights',   ar:'الرحلات', rank:[['fursan','3×'],['premier','2×'],['cashback','+1%'],['ajb','+1%']]}
+  ];
+  var i = 0, timer = null, started = false, ROW = 44;
+  function lang(){ return document.documentElement.lang === 'ar' ? 'ar' : 'en'; }
+
+  function apply(c, roll){
+    icon.className = 'ph ' + c.icon;
+    lbl.textContent = c[lang()];
+    c.rank.forEach(function(pair, idx){
+      var el = rows[pair[0]]; if(!el) return;
+      el.style.top = (idx * ROW) + 'px';
+      el.querySelector('.rk-num').textContent = pair[1];
+      var win = idx === 0;
+      el.classList.toggle('win', win);
+      if(win && roll){ el.classList.remove('roll'); void el.offsetWidth; el.classList.add('roll'); }
+    });
+  }
+  function swap(){ intent.classList.remove('swap'); void intent.offsetWidth; intent.classList.add('swap'); }
+  function tick(){ i = (i + 1) % CATS.length; swap(); apply(CATS[i], true); }
+  function start(){ if(!timer) timer = setInterval(tick, 2800); }
+  function stop(){ if(timer){ clearInterval(timer); timer = null; } }
+
+  apply(CATS[0], false);
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(e.isIntersecting){ if(!started){ started = true; setTimeout(start, 800); } else start(); }
+        else stop();
+      });
+    }, {threshold:.35}).observe(rack);
+  } else { start(); }
+
+  /* keep the category label localized when the page language toggles */
+  new MutationObserver(function(){ apply(CATS[i], false); })
+    .observe(document.documentElement, {attributes:true, attributeFilter:['lang']});
+})();
+</script>
+</body>
+</html>
