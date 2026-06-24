@@ -106,6 +106,7 @@ html[dir="rtl"] .hero-mock .sc-text{ direction:rtl }
 html[dir="rtl"] .hero-mock .pay-prompt > span{ direction:rtl }
 html[dir="rtl"] .hero-mock .ab-sub,
 html[dir="rtl"] .hero-mock .ab-main{ direction:rtl }   /* keep the appbar title CENTERED (don't override .appbar's text-align) */
+html[lang="ar"] .hero-mock .app{ font-family:var(--ar) }   /* phone UI text: clean IBM Plex Sans Arabic, not the macOS system Arabic fallback */
 html[dir="rtl"] .rack-intent{ direction:rtl }
 /* keep the category chip's icon+name as a unit (icon to the LEFT of the name) so «الأفضل لـ [name]» reads together */
 html[dir="rtl"] .rack-intent .ri-cat{ direction:ltr }
@@ -420,7 +421,7 @@ html[lang="ar"] .closer-line{ white-space:nowrap; font-size:clamp(22px,5.8vw,54p
 
   /* ---- BEAT 1: step-open (the wallet opens — all cards crisp, rise back-to-front) ---- */
   .device.step-open .appbar{opacity:1}
-  .device.step-open .card{opacity:1; transform:translateY(0)}
+  .device.step-open .card{opacity:1}
   .device.step-open .best, .device.step-open .rest{filter:none}
   .device.step-open .r1{transition-delay:0s}
   .device.step-open .r2{transition-delay:.06s}
@@ -429,9 +430,21 @@ html[lang="ar"] .closer-line{ white-space:nowrap; font-size:clamp(22px,5.8vw,54p
   .device.step-open .best .ring, .device.step-open .best .reward,
   .device.step-open .rest-tags, .device.step-open .pay-prompt, .device.step-open .cats, .device.step-open .side-cue{opacity:0}
 
+  /* ---- OPENING CASCADE: all 4 cards gather into one Apple-Wallet stack (tops visible, the pick in front) ---- */
+  /* fade in just under the cascade and settle up; held crisp through step-open, softly blurred through step-pay;
+     on resolve the pick RISES to the top + the rest drop away to the lower wallet */
+  .device.preintro .r1{ transform:translateY(-386px) }
+  .device.preintro .r2{ transform:translateY(-354px) }
+  .device.preintro .r3{ transform:translateY(-322px) }
+  .device.preintro .best{ transform:translateY(312px) }
+  .device.step-open .r1, .device.step-pay .r1{ transform:translateY(-410px) }
+  .device.step-open .r2, .device.step-pay .r2{ transform:translateY(-378px) }
+  .device.step-open .r3, .device.step-pay .r3{ transform:translateY(-346px) }
+  .device.step-open .best, .device.step-pay .best{ transform:translateY(288px) }
+
   /* ---- BEAT 2: step-pay (the WHOLE wallet goes cleanly out of focus + the white prompt) ---- */
   .device.step-pay .appbar{opacity:0}
-  .device.step-pay .card{opacity:1; transform:translateY(0)}
+  .device.step-pay .card{opacity:1}
   .device.step-pay .stack{transform:translateX(-8px) scale(.985)}       /* the 'press' nudge */
   .device.step-pay .best{filter:blur(1px) brightness(.64) saturate(.88)}
   .device.step-pay .rest{filter:blur(1.2px) brightness(.58) saturate(.88)}
@@ -1285,10 +1298,11 @@ using Ace</span>
   function playIntro(){
     if(hasPlayed) return; hasPlayed=true;
     if(!playing){ resolveNow(); return; }                 // reduced-motion / ?still → straight to the pick
-    setStep('step-open'); setHeader('open');              // 1 · the wallet opens (cards rise, all crisp)
-    iAt(950,  function(){ setStep('step-pay'); });        // 2 · double-click to pay (rack into depth of field)
-    iAt(2200, resolveNow);                                // 3 · resolve to the pick + interactive UI
-    iAt(3700, function(){ if(!introDone) resolveNow(); });// safety net if a transition is dropped
+    paint(ORDER[idx], false);                             // 0 · fill all 4 cards so the opening shows the FULL stack
+    setStep('step-open'); setHeader('open');              // 1 · the wallet opens — all cards gather into one stack
+    iAt(1200, function(){ setStep('step-pay'); });        // 2 · double-click to pay (stack racks into depth of field)
+    iAt(2400, resolveNow);                                // 3 · the pick rises to the top + interactive UI
+    iAt(3900, function(){ if(!introDone) resolveNow(); });// safety net if a transition is dropped
   }
 
   function applyLang(){
