@@ -99,6 +99,33 @@ button{font-family:inherit}
 .hero::before{content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
   background:radial-gradient(680px 520px at 78% 34%, rgba(43,209,126,.11), transparent 62%)}
 html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%, rgba(43,209,126,.11), transparent 62%)}
+/* RTL bidi: Arabic text reads correctly even inside the LTR-forced iPhone mockup + #get rack
+   (mockup is direction:ltr for the iOS chrome; these text nodes must flip back to RTL, and any
+   Latin token like "Ace" then lands at the correct end). */
+html[dir="rtl"] .hero-mock .sc-text{ direction:rtl }
+html[dir="rtl"] .hero-mock .pay-prompt > span{ direction:rtl }
+html[dir="rtl"] .hero-mock .ab-sub,
+html[dir="rtl"] .hero-mock .ab-main{ direction:rtl }   /* keep the appbar title CENTERED (don't override .appbar's text-align) */
+html[dir="rtl"] .rack-intent{ direction:rtl }
+/* keep the category chip's icon+name as a unit (icon to the LEFT of the name) so «الأفضل لـ [name]» reads together */
+html[dir="rtl"] .rack-intent .ri-cat{ direction:ltr }
+/* CSS letter-spacing breaks Arabic's connected letters — drop it on the mockup's uppercase micro-labels */
+html[dir="rtl"] .hero-mock .best .reward small{ letter-spacing:0; text-transform:none }
+html[dir="rtl"] .hero-mock .best .reward{ direction:rtl }  /* mirror the badge: icon leads on the right in RTL */
+html[lang="ar"] .sec-kicker{ letter-spacing:0 }
+/* pay-sheet (#how step 4) reads RTL in Arabic: flip the label/value rows + bidi for mixed AR+number labels */
+html[dir="rtl"] .hiw-stage.s4 .ctx,
+html[dir="rtl"] .hiw-stage.s4 .card-row,
+html[dir="rtl"] .hiw-stage.s4 .pay-row{ direction:rtl }
+html[dir="rtl"] .hiw-stage.s4 .card-row .s,
+html[dir="rtl"] .hiw-stage.s2 .best-tag{ direction:rtl }
+/* Arabic display headings: looser leading + NO negative tracking (negative letter-spacing overlaps Arabic's
+   connected glyphs, and the tight EN line-height makes stacked AR lines collide). */
+html[lang="ar"] .h1{ line-height:1.45; letter-spacing:0 }
+html[lang="ar"] .sec-title,
+html[lang="ar"] .closer-line,
+html[lang="ar"] .wyg-card h3,
+html[lang="ar"] .hiw-cap h3{ line-height:1.35; letter-spacing:0 }
 .hero-in{position:relative; z-index:1; display:grid; grid-template-columns:1.04fr .96fr; gap:40px; align-items:center;
   max-width:var(--maxw); margin:0 auto; padding:36px 24px 64px; min-height:min(860px, calc(100dvh - 64px))}
 .hero-copy{max-width:580px}
@@ -114,7 +141,12 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
   .hero-form{margin-inline:auto}
   .hero-visual{order:2}
 }
-@media(max-width:430px){ .hero-mock{transform:scale(.84); transform-origin:top center; margin-bottom:-104px} }
+@media(max-width:430px){
+  .hero-mock{transform:scale(.84); transform-origin:top center; margin-bottom:-104px}
+  .h1{font-size:28px; line-height:1.1; letter-spacing:-.02em}
+  .hero-sub{font-size:16px}
+  .hero-in{padding:16px 20px 40px}
+}
 
 /* ---------- signup form ---------- */
 .signup{display:flex; flex-wrap:wrap; gap:10px}
@@ -185,17 +217,21 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
 .rk.win .rk-num{color:var(--emerald)}
 .rk.win.roll .rk-num{animation:numRoll .5s var(--ease-out)}
 
-/* CARD 2 — "No new card, no new account": the cards already in your wallet fan out like a hand. Emerald-free. */
-.fan{position:absolute; inset:0; perspective:1000px}
-.fc{position:absolute; left:50%; bottom:2px; width:150px; margin-left:-75px; border-radius:11px; overflow:hidden;
-  transform-origin:50% 168%; box-shadow:0 18px 34px -14px rgba(0,0,0,.85), 0 -1px 0 rgba(255,255,255,.05);
-  transition:transform .95s var(--ease-out)}
-.fc img{width:100%; display:block}
-.fc0{transform:rotate(-25deg)   translateY(4px)  scale(.95);  z-index:1}
-.fc1{transform:rotate(-12.5deg) translateY(-5px) scale(.985); z-index:2}
-.fc2{transform:rotate(0deg)     translateY(-9px) scale(1);    z-index:3}
-.fc3{transform:rotate(12.5deg)  translateY(-5px) scale(.985); z-index:2}
-.fc4{transform:rotate(25deg)    translateY(4px)  scale(.95);  z-index:1}
+/* CARD 2 — "No new card, no new account": your existing cards CONVERGE into one tidy wallet.
+   Research-led (Curve "many→one" + Apple-Wallet stack): NO card is hero'd — equal peers, desaturated,
+   emerald-free; the wow is the magnetic convergence on scroll-in. Brand-neutral by construction. */
+.merge{position:absolute; inset:0; display:grid; place-items:center}
+.mc{position:absolute; width:148px; border-radius:11px; overflow:hidden;
+  box-shadow:0 14px 32px -12px rgba(0,0,0,.85), 0 -1px 0 rgba(255,255,255,.05);
+  filter:saturate(.58) brightness(.9);
+  transition:transform .85s cubic-bezier(.18,1,.3,1), opacity .5s var(--ease), filter .85s var(--ease)}
+.mc img{width:100%; display:block}
+/* rest = a tidy overlapping stack — equal treatment, none spotlighted */
+.mc0{transform:translateY(-50px) scale(.9);   z-index:1; filter:saturate(.46) brightness(.7)}
+.mc1{transform:translateY(-25px) scale(.94);  z-index:2; filter:saturate(.52) brightness(.82)}
+.mc2{transform:translateY(0)     scale(.97);  z-index:3; filter:saturate(.58) brightness(.9)}
+.mc3{transform:translateY(25px)  scale(1);    z-index:4; filter:saturate(.6)  brightness(.96)}
+.mc4{transform:translateY(50px)  scale(1.02); z-index:5; filter:saturate(.62) brightness(1)}
 
 /* cursor-follow border glow (Linear) — neutral light on the EDGE, not the face */
 .wyg-card .glow-border{position:absolute; inset:0; border-radius:22px; padding:1px; pointer-events:none; opacity:0; z-index:2; transition:opacity .3s var(--ease);
@@ -208,11 +244,19 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
 @keyframes rackSwap{ 0%{opacity:1} 38%{opacity:0; transform:translateY(-5px)} 62%{opacity:0; transform:translateY(5px)} 100%{opacity:1; transform:translateY(0)} }
 
 @media (prefers-reduced-motion: no-preference){
-  /* the fan stays stacked until the card scrolls into view, then opens once into a hand */
-  .wyg-card:not(.in) .fan .fc{transform:rotate(0deg) translateY(13px) scale(.93)}
-  .wyg-card.in .fan .fc0{transition-delay:.05s} .wyg-card.in .fan .fc1{transition-delay:.12s}
-  .wyg-card.in .fan .fc2{transition-delay:.19s} .wyg-card.in .fan .fc3{transition-delay:.26s} .wyg-card.in .fan .fc4{transition-delay:.33s}
+  /* before scroll-in the cards are scattered; on .in they magnetically converge into the stack */
+  .wyg-card:not(.in) .merge .mc{opacity:0}
+  .wyg-card:not(.in) .merge .mc0{transform:translate(-94px,-22px) rotate(-19deg) scale(.82)}
+  .wyg-card:not(.in) .merge .mc1{transform:translate(82px,-54px)  rotate(15deg)  scale(.82)}
+  .wyg-card:not(.in) .merge .mc2{transform:translate(-72px,52px)  rotate(-12deg) scale(.82)}
+  .wyg-card:not(.in) .merge .mc3{transform:translate(96px,30px)   rotate(13deg)  scale(.82)}
+  .wyg-card:not(.in) .merge .mc4{transform:translate(10px,-70px)  rotate(-5deg)  scale(.82)}
+  .wyg-card.in .merge .mc0{transition-delay:0s}    .wyg-card.in .merge .mc1{transition-delay:.06s}
+  .wyg-card.in .merge .mc2{transition-delay:.12s}  .wyg-card.in .merge .mc3{transition-delay:.18s}
+  .wyg-card.in .merge .mc4{transition-delay:.24s}
+  .wyg-card.in .merge{animation:mergeFloat 5.5s var(--ease) 1.2s infinite}
 }
+@keyframes mergeFloat{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
 
 @media(max-width:820px){ .wyg-grid{grid-template-columns:1fr; max-width:480px} .wyg-card{min-height:0} }
 
@@ -221,9 +265,11 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
 .closer::before{content:""; position:absolute; left:50%; top:42%; width:760px; height:520px; transform:translate(-50%,-50%);
   background:radial-gradient(closest-side, rgba(43,209,126,.16), transparent 72%); pointer-events:none}
 .closer-in{position:relative; z-index:1; max-width:680px; margin:0 auto; padding:0 24px}
-.closer-line{font-size:clamp(40px,7.4vw,76px); font-weight:600; letter-spacing:-.038em; line-height:1.02; margin:0; color:#fff}
+.closer-line{font-size:clamp(22px,6vw,58px); font-weight:600; letter-spacing:-.038em; line-height:1.02; margin:0; color:#fff; white-space:nowrap}
+html[lang="ar"] .closer-line{ white-space:nowrap; font-size:clamp(22px,5.8vw,54px); line-height:1.15 }
 .closer-line .ace{color:var(--emerald)}
-.closer p{margin:22px auto 0; color:#bdbdc4; font-size:clamp(16px,1.8vw,19px); max-width:44ch; line-height:1.6}
+.closer p{margin:22px auto 0; color:#bdbdc4; font-size:clamp(15px,1.7vw,18px); max-width:none; line-height:1.6; white-space:nowrap}
+@media(max-width:560px){ .closer p{white-space:normal; max-width:40ch; margin-inline:auto} }
 .closer .signup{margin:36px auto 0; max-width:460px}
 .closer .form-foot{justify-content:center}
 
@@ -257,6 +303,7 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
    KEYFRAMES — hoisted from the prebuilt components (names are globally unique).
    ============================================================================ */
 @keyframes cardSwap{0%{opacity:.5} 100%{opacity:1}}                                   /* hero card swap */
+@keyframes rackFocus{ 0%{filter:blur(3px)} 100%{filter:blur(0)} }                     /* hero re-pick snap-into-focus */
 @keyframes sway{                                                                       /* step1 deck */
   0%,100%{transform:rotateX(8deg) rotateY(-15deg) translateY(-7px)}
   50%    {transform:rotateX(6deg) rotateY(-3deg)  translateY(7px)}
@@ -280,8 +327,6 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
 @keyframes hero-dot{ 0%,100%{opacity:.4; transform:scale(.8)} 50%{opacity:1; transform:scale(1)} }
 @keyframes hero-sheen{ 0%,72%{transform:translateX(-190%) skewX(-9deg)} 86%,100%{transform:translateX(320%) skewX(-9deg)} }
 /* hero "pick" sequence — the scan-line sweeps the hand; the side button double-pulses */
-@keyframes scanSweep{ 0%{transform:translateX(0); opacity:0} 14%{opacity:1} 84%{opacity:1} 100%{transform:translateX(316px); opacity:0} }
-@keyframes sidePulse{ 0%,100%{box-shadow:none} 50%{box-shadow:-3px 0 13px 3px rgba(43,209,126,.85), 0 0 0 3px rgba(43,209,126,.35)} }
 
 /* ============================================================================
    @scope — HERO mockup (inlined verbatim from iphone.html).
@@ -312,64 +357,143 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
   .sb-time{font-family:-apple-system,'SF Pro Text',var(--en); font-weight:600; font-size:15px; letter-spacing:.2px}
   .sb-icons{display:flex; align-items:center; gap:6px}
   .sb-icons svg{display:block}
-  /* ---- focused "best card to pay" screen: the card is the animated hero (no spending widgets) ---- */
-  .app{position:absolute; top:50px; left:0; right:0; bottom:0; z-index:12; padding:14px 18px 16px;
-    display:flex; flex-direction:column; color:#ECECEE; font-family:var(--en)}
-  .appbar{text-align:center; line-height:1.2}
+  /* ---- "best card to pay" screen: your real cards fan like a poker hand; the best one is picked ---- */
+  /* ============================================================================
+     Hero PRODUCT JOURNEY (state classes live on .device — a descendant; the
+     @scope root .hero-mock would silently fail to match):
+       preintro  -> hidden (no flash; set in the HTML class)
+       step-open -> the wallet opens: 5 real cards rise back-to-front, all CRISP
+       step-pay  -> "double click to pay": the whole wallet racks into stepped
+                    gaussian depth-of-field + the white side-button prompt
+       resolved  -> the pick: 1 crisp emerald-ringed card; the other 4 recede in
+                    shallow DoF (blurred, not dimmed); category row interactive.
+     5 real landscape cards, ONE shared geometry across every beat.
+     ============================================================================ */
+  .app{position:absolute; top:50px; left:0; right:0; bottom:0; z-index:12; padding:0; color:#ECECEE; font-family:var(--en)}
+  .appbar{position:absolute; top:18px; left:0; right:0; text-align:center; line-height:1.2; transition:opacity .4s var(--ease), transform .4s var(--ease)}
   .ab-sub{display:block; font-size:11.5px; color:var(--muted); font-weight:500}
   .ab-main{display:block; font-size:17px; font-weight:600; color:#fff; letter-spacing:-.01em; margin-top:1px}
+  .wallet-scrim{position:absolute; inset:0; z-index:14; pointer-events:none; opacity:0;
+    background:linear-gradient(180deg, rgba(0,0,0,.26), rgba(0,0,0,.46) 48%, rgba(0,0,0,.38));
+    backdrop-filter:blur(4px) saturate(.94); -webkit-backdrop-filter:blur(4px) saturate(.94);
+    transition:opacity .3s var(--ease)}
 
-  .pick{position:relative; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; margin-top:8px}
-  .pick-tag{display:inline-flex; align-items:center; font-size:11px; font-weight:600; letter-spacing:.05em; color:var(--emerald)}
+  /* ---- the wallet: selected card high, real Wallet-style lower stack below ---- */
+  .stack{position:absolute; top:70px; left:50%; width:286px; margin-left:-143px; z-index:6; transition:transform .5s var(--ease-out)}
+  .stack::before{content:""; position:absolute; left:50%; top:12px; width:318px; height:206px; margin-left:-159px; z-index:-1; pointer-events:none; opacity:0;
+    background:radial-gradient(closest-side, rgba(43,209,126,.16), transparent 72%); filter:blur(16px); transition:opacity .6s var(--ease)}
 
-  .pick-stage{position:relative; height:226px; margin-top:16px; display:grid; place-items:center; perspective:1000px}
-  .pick-glow{position:absolute; z-index:0; width:250px; height:200px; border-radius:50%; pointer-events:none; opacity:.7;
-    background:radial-gradient(closest-side, rgba(43,209,126,.34), transparent 70%); filter:blur(9px)}
+  .card{position:absolute; left:50%; border-radius:15px; transform:translateZ(0);
+    transition:transform .55s var(--ease-out), opacity .45s var(--ease)}
+  .card img{width:100%; display:block; border-radius:15px}
+  /* the PICK — crisp, lifted, emerald ring + reward (the only emerald) */
+  .best{top:0; width:286px; margin-left:-143px; z-index:20; filter:none; transition:transform .55s var(--ease-out), filter .5s var(--ease), opacity .45s var(--ease)}
+  .best img{position:relative; z-index:1; box-shadow:0 22px 46px -16px rgba(0,0,0,.95)}
+  .best::after{content:""; position:absolute; inset:1px; z-index:2; border-radius:15px; pointer-events:none; opacity:0;
+    background:linear-gradient(128deg, rgba(255,255,255,.18), transparent 34%, transparent 70%, rgba(255,255,255,.07));
+    mix-blend-mode:screen; transition:opacity .45s var(--ease) .18s}
+  .best .ring{position:absolute; inset:-4px; z-index:3; border-radius:19px; pointer-events:none; opacity:0; transition:opacity .45s var(--ease) .18s;
+    border:1.5px solid rgba(43,209,126,.9);
+    box-shadow:0 0 0 1px rgba(255,255,255,.16) inset, 0 0 0 3px rgba(43,209,126,.08), 0 0 34px rgba(43,209,126,.34)}
+  .best .reward{position:absolute; top:11px; right:11px; display:inline-flex; align-items:center; gap:7px; padding:6px 11px; border-radius:10px;
+    z-index:4; background:var(--emerald); color:#06160F; font-weight:700; font-size:12px; line-height:1; box-shadow:0 4px 12px rgba(0,0,0,.35);
+    opacity:0; transform:scale(.9); transform-origin:100% 0; transition:opacity .4s var(--ease) .2s, transform .4s var(--ease-out) .2s}
+  .best .reward i{font-size:14px; line-height:1}
+  .best .reward span{display:grid; gap:1px}
+  .best .reward small{font-size:8.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; opacity:.74}
+  .best .reward b{font-size:13px; line-height:1}
+  .best.swap{animation:rackFocus .28s var(--ease)}   /* category re-pick: the new winner snaps into focus */
 
-  /* THE WALLET — your real cards fanned like a hand; AceWallet scans them and the best one rises out */
-  .wallet{position:absolute; inset:0}
-  .wc{position:absolute; left:50%; bottom:16px; width:132px; margin-left:-66px; transform-origin:50% 150%;
-    transition:transform .7s var(--ease-out), filter .55s var(--ease), opacity .55s var(--ease)}
-  .wc img{width:100%; display:block; border-radius:11px; box-shadow:0 16px 30px -14px rgba(0,0,0,.85)}
-  .wc.c0{transform:rotate(-21deg)   translateX(-80px) translateY(10px); z-index:2}
-  .wc.c1{transform:rotate(-12.6deg) translateX(-48px) translateY(2px);  z-index:4}
-  .wc.c2{transform:rotate(-4.2deg)  translateX(-16px) translateY(-3px); z-index:6}
-  .wc.c3{transform:rotate(4.2deg)   translateX(16px)  translateY(-3px); z-index:5}
-  .wc.c4{transform:rotate(12.6deg)  translateX(48px)  translateY(2px);  z-index:3}
-  .wc.c5{transform:rotate(21deg)    translateX(80px)  translateY(10px); z-index:1}
-  .wallet.engaged .wc:not(.win){filter:grayscale(1) brightness(.42); opacity:.6}
-  .wc.win{transform:translateX(0) translateY(-44px) rotate(0deg) scale(1.16); z-index:20; filter:none; opacity:1}
-  .wc.win::after{content:""; position:absolute; inset:-5px; border-radius:16px; pointer-events:none;
-    border:1.6px solid rgba(43,209,126,.9); box-shadow:0 0 0 4px rgba(43,209,126,.10), 0 0 30px rgba(43,209,126,.42)}
+  /* lower cards: visible below like Apple Wallet, not blurred behind the selected card */
+  .rest{position:absolute; top:440px; left:0; right:0; height:288px; z-index:5; transition:filter .5s var(--ease)}
+  .rest .r{position:absolute; left:50%; width:286px; margin-left:-143px; border-radius:15px; transform:translateZ(0); transition:transform .55s var(--ease-out), opacity .45s var(--ease)}
+  .rest .r img{width:100%; display:block; border-radius:15px; box-shadow:0 -1px 0 rgba(255,255,255,.08), 0 16px 30px rgba(0,0,0,.66)}
+  .rest .r1{top:0; z-index:1}
+  .rest .r2{top:54px; z-index:2}
+  .rest .r3{top:108px; z-index:3}
 
-  /* the scan-line that sweeps the hand before the pick */
-  .scan{position:absolute; top:14%; bottom:34%; left:0; z-index:15; width:48px; margin-left:-24px; pointer-events:none; opacity:0;
-    background:linear-gradient(90deg, transparent, rgba(120,255,194,.55), transparent); filter:blur(5px)}
-  .pick-stage.scanning .scan{animation:scanSweep 1.05s var(--ease) forwards}
+  /* ---- BEAT 0: preintro (hidden, no layout shift, no flash) ---- */
+  .device.preintro .appbar{opacity:0}
+  .device.preintro .card{opacity:0; transform:translateY(26px)}
+  .device.preintro .best .ring, .device.preintro .best .reward,
+  .device.preintro .rest-tags, .device.preintro .pay-prompt, .device.preintro .cats, .device.preintro .side-cue{opacity:0}
 
-  .pick-earn{margin-top:26px}
-  .earn-label{font-size:11.5px; color:var(--muted)}
-  .earn-val{display:flex; align-items:baseline; justify-content:center; gap:7px; margin-top:4px}
-  .earn-num{font-size:37px; font-weight:700; color:var(--emerald); letter-spacing:-.025em; line-height:1}
-  .earn-unit{font-size:17px; font-weight:600; color:var(--emerald)}
-  .pick-why{display:inline-flex; align-items:center; gap:7px; margin-top:14px; padding:7px 13px; border-radius:999px;
-    background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08)}
-  .why-check{flex:none; width:16px; height:16px; border-radius:50%; display:grid; place-items:center; background:rgba(43,209,126,.18); color:var(--emerald); font-size:9px}
-  .why-text{font-size:11px; color:#c2c2c8; line-height:1.3}
+  /* ---- BEAT 1: step-open (the wallet opens — all cards crisp, rise back-to-front) ---- */
+  .device.step-open .appbar{opacity:1}
+  .device.step-open .card{opacity:1; transform:translateY(0)}
+  .device.step-open .best, .device.step-open .rest{filter:none}
+  .device.step-open .r1{transition-delay:0s}
+  .device.step-open .r2{transition-delay:.06s}
+  .device.step-open .r3{transition-delay:.12s}
+  .device.step-open .best{transition-delay:.18s}
+  .device.step-open .best .ring, .device.step-open .best .reward,
+  .device.step-open .rest-tags, .device.step-open .pay-prompt, .device.step-open .cats, .device.step-open .side-cue{opacity:0}
 
-  .cats{display:flex; gap:7px}
-  .cat{flex:1; display:grid; place-items:center; height:40px; border-radius:12px; cursor:pointer; color:var(--faint); border:0;
-    background:rgba(255,255,255,.04); box-shadow:inset 0 0 0 1px rgba(255,255,255,.07); font-size:18px; transition:color .25s, background .25s, box-shadow .25s}
+  /* ---- BEAT 2: step-pay (the WHOLE wallet goes cleanly out of focus + the white prompt) ---- */
+  .device.step-pay .appbar{opacity:0}
+  .device.step-pay .card{opacity:1; transform:translateY(0)}
+  .device.step-pay .stack{transform:translateX(-8px) scale(.985)}       /* the 'press' nudge */
+  .device.step-pay .best{filter:blur(1px) brightness(.64) saturate(.88)}
+  .device.step-pay .rest{filter:blur(1.2px) brightness(.58) saturate(.88)}
+  .device.step-pay .best .ring, .device.step-pay .best .reward,
+  .device.step-pay .rest-tags, .device.step-pay .pay-prompt, .device.step-pay .cats{opacity:0}
+  .device.step-pay .wallet-scrim{opacity:1}
+  .device.step-pay .side-cue{opacity:1; transform:translateX(0)}
+  /* (no power-button glow — the side-button prompt pill already pulses; a second glow is redundant) */
+
+  /* ---- BEAT 3/4: resolved (the pick crisp; the rest softly + CLEANLY out of focus) ---- */
+  .device.resolved .appbar{opacity:0; transform:translateY(-4px)}
+  .device.resolved .card{opacity:1; will-change:auto}
+  .device.resolved .best{transform:none; filter:none}
+  .device.resolved .rest{filter:none}
+  .device.resolved .best::after{opacity:.28}
+  .device.resolved .best .ring, .device.resolved .best .reward{opacity:1}
+  .device.resolved .rest-tags, .device.resolved .pay-prompt{opacity:1}
+  .device.resolved .stack::before{opacity:.22}
+  .device.resolved .cats{opacity:1}
+  .device.resolved .side-cue{opacity:0; transform:translateX(10px)}    /* prompt retires */
+
+  /* ---- the iOS "Double Click to Pay" prompt — one system phrase, two lines, all white (Beat 2 only) ---- */
+  .side-cue{position:absolute; z-index:16; top:170px; right:13px; height:70px; display:flex; align-items:center; gap:8px; pointer-events:none;
+    opacity:0; transform:translateX(8px); transition:opacity .34s var(--ease), transform .34s var(--ease)}
+  .sc-text{max-width:150px; text-align:right; white-space:pre-line; font-size:15.5px; line-height:1.14; font-weight:650; color:#fff; letter-spacing:0; text-shadow:0 2px 15px rgba(0,0,0,1)}
+  .sc-pill{flex:none; width:5px; height:60px; border-radius:999px; background:linear-gradient(180deg,#fff,#eaeaef); box-shadow:0 0 16px 2px rgba(255,255,255,.48)}
+  @media (prefers-reduced-motion: no-preference){ .device.step-pay .sc-pill{animation:barpulse 1.6s ease-in-out infinite} }
+
+  /* the other cards' REAL rewards stay SHARP over the darkened blur — the proof AceWallet picked the highest */
+  .rest-tags{position:absolute; top:440px; left:0; right:0; z-index:28; pointer-events:none; opacity:0; transition:opacity .5s var(--ease) .18s}
+  .rtag{position:absolute; right:14px; display:inline-flex; align-items:center; gap:4px; min-width:44px; justify-content:center; padding:7px 10px; border-radius:9px;
+    background:rgba(42,42,44,.62); border:1px solid rgba(255,255,255,.38); color:#f3f3f4; font-size:13px; font-weight:800;
+    box-shadow:0 2px 8px rgba(0,0,0,.28); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); white-space:nowrap}
+  .rtag1{top:14px} .rtag2{top:68px} .rtag3{top:122px}
+
+  /* Apple Pay placement: provided reader animation below the selected card */
+  .pay-prompt{position:absolute; top:285px; left:50%; width:210px; margin-left:-105px; z-index:11; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0;
+    text-align:center; opacity:0; color:#e9e9ed; transform:translateY(-4px) scale(.98); transition:opacity .46s var(--ease) .18s, transform .46s var(--ease-out) .18s}
+  .reader{position:relative; width:72px; height:62px; flex:none; pointer-events:none; filter:drop-shadow(0 3px 12px rgba(0,122,255,.2))}
+  .reader dotlottie-player{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:116px; height:88px}
+  .device.resolved .pay-prompt{transform:translateY(0) scale(1)}
+  .pay-prompt > span{display:block; color:#d7d7dc; font-size:17px; line-height:1.14; font-weight:500; letter-spacing:0; text-shadow:0 2px 16px rgba(0,0,0,.52)}
+
+  /* working spend-category selector (tap re-picks the best card instantly) */
+  .cats{position:absolute; left:26px; right:26px; top:398px; display:flex; gap:4px; padding:5px; border-radius:13px; opacity:0;
+    background:rgba(30,30,31,.78); border:1px solid rgba(255,255,255,.07); box-shadow:0 12px 24px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.055);
+    backdrop-filter:blur(7px) saturate(1.04); -webkit-backdrop-filter:blur(7px) saturate(1.04); transition:opacity .4s var(--ease) .2s}
+  .device:not(.resolved) .cats{pointer-events:none}
+  .cat{flex:1; display:grid; place-items:center; height:36px; border-radius:13px; cursor:pointer; color:var(--faint); border:0;
+    background:transparent; box-shadow:none; font-size:18px; transition:color .22s, background .22s, box-shadow .22s, transform .22s}
   .cat:hover{color:var(--muted)}
-  .cat.active{color:var(--emerald); background:rgba(43,209,126,.14); box-shadow:inset 0 0 0 1px rgba(43,209,126,.42)}
+  .cat.active{color:var(--emerald); background:rgba(43,209,126,.16); box-shadow:inset 0 0 0 1px rgba(43,209,126,.45), 0 8px 18px rgba(43,209,126,.1); transform:translateY(-1px)}
 
-  /* reveal the reward only at the moment of the pick; the side button pulses on the "double-click to pay" beat */
-  .pick .pick-earn, .pick .pick-why{opacity:0; transition:opacity .45s var(--ease)}
-  .pick.revealed .pick-earn, .pick.revealed .pick-why{opacity:1}
-  .hero-mock.paying .btn-side.power{animation:sidePulse .42s ease 0s 2}
-  @media (prefers-reduced-motion: no-preference){
-    .pick-glow{animation:hero-glow 5s ease-in-out infinite}
+  @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+    .wallet-scrim{background:rgba(0,0,0,.62)}
+    .cats,.rtag{background:rgba(30,30,31,.94)}
   }
+  @media (prefers-reduced-transparency: reduce){
+    .wallet-scrim,.cats,.rtag{backdrop-filter:none; -webkit-backdrop-filter:none}
+    .wallet-scrim{background:rgba(0,0,0,.64)}
+  }
+
   .home-ind{position:absolute; bottom:9px; left:50%; transform:translateX(-50%); width:128px; height:5px; border-radius:3px; background:rgba(255,255,255,.5); z-index:22}
 }
 
@@ -503,10 +627,11 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
     <nav class="nav-links" aria-label="Primary">
       <a href="#how" data-en="How it works" data-ar="كيف يعمل">How it works</a>
       <a href="#get" data-en="What you get" data-ar="ما الذي تحصل عليه">What you get</a>
+      <a href="faq.html" data-en="FAQ" data-ar="الأسئلة الشائعة">FAQ</a>
     </nav>
     <div class="nav-right">
       <button class="lang-btn" id="langBtn" type="button" aria-label="Switch language">العربية</button>
-      <a class="btn btn-primary btn-sm nav-cta" href="#join" data-en="Join the beta" data-ar="انضمّ إلى النسخة التجريبية">Join the beta</a>
+      <a class="btn btn-primary btn-sm nav-cta" href="apply.html" data-en="Priority access" data-ar="أولوية التجربة">Priority access</a>
     </div>
   </div>
 </header>
@@ -517,10 +642,10 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
     <div class="hero-in">
       <div class="hero-copy">
         <h1 class="h1" data-reveal>
-          <span data-en="Apple Wallet shows your cards. We pick the best one." data-ar="‏Apple Wallet يعرض بطاقاتك. ونحن نختار الأفضل.">Apple Wallet shows your cards. We pick the best one.</span>
+          <span data-en="Like Apple Wallet, but it picks the card that earns you the most." data-ar="زي محفظة أبل، بس تختار لك البطاقة اللي تكسبك أكثر.">Like Apple Wallet, but it picks the card that earns you the most.</span>
         </h1>
         <p class="hero-sub" data-reveal style="transition-delay:.06s">
-          <span data-en="Which card&rsquo;s best for " data-ar="أي بطاقة هي الأفضل لـ"></span><span class="rot" id="heroRot"></span><span data-en="? You&rsquo;re guessing. " data-ar="؟ أنت تخمّن. "></span><bdi>AceWallet</bdi><span data-en=" knows — and pays with it." data-ar=" يعرف — ويدفع بها."></span>
+          <span data-en="Imagine the rewards you&rsquo;ve lost on " data-ar="تخيّل المكافآت اللي ضاعت عليك في&#160;"></span><span class="rot" id="heroRot"></span><span data-en="… " data-ar="… "></span><bdi data-en="AceWallet" data-ar="محفظة ايس">AceWallet</bdi><span data-en=" picks the right card for you, and pays with it." data-ar=" تختار لك البطاقة الصح، وتحاسب فيها."></span>
         </p>
         <form class="signup hero-form" data-reveal style="transition-delay:.12s" novalidate>
           <div class="field">
@@ -529,9 +654,9 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
                    data-ph-en="you@example.com" data-ph-ar="you@example.com" placeholder="you@example.com"
                    data-aria-en="Email address" data-aria-ar="البريد الإلكتروني" aria-label="Email address" />
           </div>
-          <button class="btn btn-primary" type="submit" data-en="Join the beta" data-ar="انضمّ إلى النسخة التجريبية">Join the beta</button>
+          <button class="btn btn-primary" type="submit" data-en="Join the waitlist" data-ar="انضم لقائمة الانتظار">Join the waitlist</button>
           <div class="form-foot" aria-live="polite">
-            <span class="micro" data-en="Free · no card details" data-ar="مجانًا · دون بيانات بطاقتك">Free · no card details</span>
+            <span class="micro" data-en="Completely free · no card details · launching soon." data-ar="مجاني بالكامل. ما نطلب بيانات بطاقتك. إطلاقنا قرّب.">Free · no card details</span>
             <span class="msg"></span>
           </div>
         </form>
@@ -541,7 +666,7 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
         <!-- HERO MOCKUP — inlined from iphone.html (the "winning hand" pay sheet).
              Re-localizes "Hold near reader" from <html lang> via its own observer. -->
         <div class="hero-mock" dir="ltr">
-          <div class="device" role="img"
+          <div class="device preintro" role="img"
                data-aria-en="Smart wallet app: the best card is selected for the chosen spend category."
                data-aria-ar="تطبيق محفظة ذكية: تُختار أفضل بطاقة لفئة الإنفاق المحددة."
                aria-label="Smart wallet app: the best card is selected for the chosen spend category.">
@@ -570,40 +695,55 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
               <div class="island"></div>
               <div class="app">
                 <div class="appbar">
-                  <span class="ab-sub" id="abSub">Best card to use</span>
-                  <span class="ab-main" id="abMain">Right now</span>
+                  <span class="ab-sub" id="abSub">Best card for</span>
+                  <span class="ab-main" id="abMain">Food delivery</span>
                 </div>
-                <div class="pick">
-                  <span class="pick-tag"><span id="pickTag">Smart pick</span></span>
-                  <div class="pick-stage" id="pickStage">
-                    <span class="pick-glow"></span>
-                    <div class="wallet" id="wallet">
-                      <div class="wc c0" data-cat="dining"    aria-hidden="true"><img src="cards/sab-cashback.png" alt="" /></div>
-                      <div class="wc c1" data-cat="gaming"    aria-hidden="true"><img src="cards/alrajhi-gamers.png" alt="" /></div>
-                      <div class="wc c2" data-cat="hotels"    aria-hidden="true"><img src="cards/alrajhi-marriott.png" alt="" /></div>
-                      <div class="wc c3" data-cat="food"      aria-hidden="true"><img src="cards/alrajhi-cashback-plus.png" alt="" /></div>
-                      <div class="wc c4" data-cat="flights"   aria-hidden="true"><img src="cards/alfursan-alinma.png" alt="" /></div>
-                      <div class="wc c5" data-cat="streaming" aria-hidden="true"><img src="cards/bsf-signature.png" alt="" /></div>
-                    </div>
-                    <span class="scan" aria-hidden="true"></span>
+
+                <!-- your wallet: 4 real upright cards. Best on top (crisp, the pick); the other 3 are one cleanly-blurred group. -->
+                <div class="stack" id="stack">
+                  <div class="rest" id="rest">
+                    <div class="card r r1"><img src="cards/sab-cashback.png" alt="" /></div>
+                    <div class="card r r2"><img alt="" /></div>
+                    <div class="card r r3"><img alt="" /></div>
                   </div>
-                  <div class="pick-earn" id="pickEarn">
-                    <div class="earn-label" id="earnLabel">You&rsquo;ll earn</div>
-                    <div class="earn-val"><b class="earn-num" id="earnNum">+5%</b><span class="earn-unit" id="earnUnit">cashback</span></div>
+                  <!-- the other cards' REAL rewards, kept sharp + readable over the darkened blur -->
+                  <div class="rest-tags" id="restTags" aria-hidden="true">
+                    <span class="rtag rtag1"></span>
+                    <span class="rtag rtag2"></span>
+                    <span class="rtag rtag3"></span>
                   </div>
-                  <div class="pick-why">
-                    <span class="why-check" aria-hidden="true"><i class="ph-bold ph-check"></i></span>
-                    <span class="why-text" id="whyText">Higher rewards than your other cards on Coffee</span>
+                  <div class="card best">
+                    <img id="bestImg" src="cards/alrajhi-cashback-plus.png" alt="Best card for the selected spend" />
+                    <span class="ring"></span>
+                    <span class="reward" id="bestReward"><i class="ph ph-moped"></i><span><small>Best</small><b>+15%</b></span></span>
                   </div>
                 </div>
+
+                <!-- the real Apple Pay "Hold near reader" NFC prompt. Reward proof stays on the selected card. -->
+                <div class="pay-prompt" id="payPrompt">
+                  <div class="reader" aria-hidden="true">
+                    <dotlottie-player src="assets/hold-near-reader.lottie" autoplay loop></dotlottie-player>
+                  </div>
+                  <span id="payText">Hold near reader</span>
+                </div>
+
+                <!-- working spend-category selector: tap to re-pick instantly -->
                 <div class="cats" id="catRow">
-                  <button class="cat active" data-cat="dining"    aria-label="Dining"><i class="ph ph-fork-knife"></i></button>
+                  <button class="cat active" data-cat="food"      aria-label="Food delivery"><i class="ph ph-moped"></i></button>
+                  <button class="cat"        data-cat="grocery"   aria-label="Groceries"><i class="ph ph-shopping-cart"></i></button>
                   <button class="cat"        data-cat="gaming"    aria-label="Gaming"><i class="ph ph-game-controller"></i></button>
                   <button class="cat"        data-cat="hotels"    aria-label="Hotels"><i class="ph ph-bed"></i></button>
-                  <button class="cat"        data-cat="food"      aria-label="Food delivery"><i class="ph ph-moped"></i></button>
+                  <button class="cat"        data-cat="retail"    aria-label="Electronics"><i class="ph ph-laptop"></i></button>
                   <button class="cat"        data-cat="flights"   aria-label="Flights"><i class="ph ph-airplane-tilt"></i></button>
-                  <button class="cat"        data-cat="streaming" aria-label="Streaming"><i class="ph ph-play-circle"></i></button>
+                  <button class="cat"        data-cat="fx"        aria-label="Spending abroad"><i class="ph ph-globe"></i></button>
                 </div>
+              </div>
+              <div class="wallet-scrim" aria-hidden="true"></div>
+              <!-- transient iOS "Double Click to Pay" prompt: white side-button pill at the screen edge -->
+              <div class="side-cue" aria-hidden="true">
+                <span class="sc-text" id="scText">Double Click to Pay
+using Ace</span>
+                <span class="sc-pill"></span>
               </div>
               <div class="home-ind"></div>
             </div>
@@ -618,7 +758,7 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
     <div class="wrap">
       <div class="sec-head" data-reveal>
         <span class="sec-kicker" data-en="How it works" data-ar="كيف يعمل">How it works</span>
-        <h2 class="sec-title" data-en="Pay like you always do." data-ar="ادفع كما تفعل دائمًا.">Pay like you always do.</h2>
+        <h2 class="sec-title" data-en="Pay like you always do." data-ar="ادفع بطريقتك اللي متعود عليها.">Pay like you always do.</h2>
       </div>
 
       <div class="hiw-grid">
@@ -640,15 +780,15 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
             </div>
           </div>
           <div class="hiw-cap">
-            <div class="row"><span class="num">01</span><h3 data-en="Add your cards" data-ar="أضِف بطاقاتك">Add your cards</h3></div>
+            <div class="row"><span class="num">01</span><h3 data-en="Add your cards" data-ar="أضف بطاقاتك">Add your cards</h3></div>
             <p data-en="Add the cards you already carry — AceWallet instantly learns each one&rsquo;s cashback, points, and perks."
-               data-ar="أضِف بطاقاتك بأمان. يعرف AceWallet فورًا ما تقدّمه كل بطاقة من كاش باك ونقاط وفئات مكافآت ومزايا.">Add the cards you already carry — AceWallet instantly learns each one&rsquo;s cashback, points, and perks.</p>
+               data-ar="أضف بطاقاتك اللي بمحفظتك أساساً — ومحفظة ايس بتعرف على طول الكاش باك، النقاط، ومزايا كل بطاقة.">Add the cards you already carry — AceWallet instantly learns each one&rsquo;s cashback, points, and perks.</p>
           </div>
         </article>
 
         <!-- 02 -->
         <article class="hiw" data-reveal style="--i:1; transition-delay:80ms">
-          <div class="hiw-frame" role="img" data-aria-en="Double-click to pay: the iPhone side button." data-aria-ar="اضغط مرّتين للدفع: الزر الجانبي للآيفون." aria-label="Double-click to pay">
+          <div class="hiw-frame" role="img" data-aria-en="Double-click to pay: the iPhone side button." data-aria-ar="اضغط مرتين للدفع: الزر الجانبي للآيفون." aria-label="Double-click to pay">
             <div class="hiw-stage s2">
               <div class="panel">
                 <div class="zoom">
@@ -659,7 +799,7 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
                         <div class="grabber"></div>
                         <div class="sheet-card">
                           <img src="cards/sab-cashback.png" alt="" loading="lazy" decoding="async" />
-                          <span class="best-tag">Best for dining · +10%</span>
+                          <span class="best-tag" data-en="Best for food delivery · +15%" data-ar="الأفضل لتوصيل مطاعم · +15%">Best for food delivery · +15%</span>
                         </div>
                       </div>
                       <div class="screen-dim"></div>
@@ -667,15 +807,15 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
                   </div>
                 </div>
                 <div class="ios-prompt">
-                  <span class="lbl" data-en="Double Click<br>to Pay" data-ar="اضغط مرّتين<br>للدفع">Double Click<br>to Pay</span>
+                  <span class="lbl" data-en="Double Click<br>to Pay" data-ar="اضغط مرتين<br>للدفع">Double Click<br>to Pay</span>
                   <span class="ios-bar"></span>
                 </div>
               </div>
             </div>
           </div>
           <div class="hiw-cap">
-            <div class="row"><span class="num">02</span><h3 data-en="Double-click to pay" data-ar="اضغط مرّتين للدفع">Double-click to pay</h3></div>
-            <p data-en="The same gesture you already use." data-ar="بالحركة نفسها التي اعتدتها.">The same gesture you already use.</p>
+            <div class="row"><span class="num">02</span><h3 data-en="Double-click to pay" data-ar="ضغطتين للدفع">Double-click to pay</h3></div>
+            <p data-en="The same gesture you already use." data-ar="نفس حركتك اللي متعود عليها.">The same gesture you already use.</p>
           </div>
         </article>
 
@@ -701,9 +841,9 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
             </div>
           </div>
           <div class="hiw-cap">
-            <div class="row"><span class="num">03</span><h3 data-en="AceWallet picks your best card" data-ar="نختار بطاقتك الأفضل">AceWallet picks your best card</h3></div>
+            <div class="row"><span class="num">03</span><h3 data-en="AceWallet picks your best card" data-ar="محفظة ايس تختار بطاقتك الأفضل">AceWallet picks your best card</h3></div>
             <p data-en="No checking, no swiping — it already knows which of your cards earns the most, and lifts it to the front."
-               data-ar="يدفع AceWallet بالبطاقة التي تربح بها أكثر في تلك العملية — تلقائيًا، في كل مرة.">No checking, no swiping — it already knows which of your cards earns the most, and lifts it to the front.</p>
+               data-ar="بدون ما تقلّب بالبطاقات وتقارن — المحفظة تعرف أي بطاقة بتعطيك أكثر، وتطلّعها لك أول وحدة.">No checking, no swiping — it already knows which of your cards earns the most, and lifts it to the front.</p>
           </div>
         </article>
 
@@ -714,7 +854,7 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
               <div class="panel">
                 <div class="ctx">
                   <div class="m"><img class="logo" src="assets/barns-white.png" alt="Barn's" loading="lazy" decoding="async" /></div>
-                  <div class="item"><span>1 &times; Flat White</span><span>SAR 18.00</span></div>
+                  <div class="item"><span data-en="1 &times; Flat White" data-ar="فلات وايت × 1">1 &times; Flat White</span><span>SAR 18.00</span></div>
                   <div class="tot"><span data-en="Total" data-ar="الإجمالي">Total</span><b>SAR 18.00</b></div>
                 </div>
                 <div class="sheet">
@@ -722,8 +862,8 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
                   <div class="card-row">
                     <div class="thumb"><img src="cards/sab-cashback.png" alt="" loading="lazy" decoding="async" /></div>
                     <div class="info">
-                      <div class="t">AceWallet</div>
-                      <span class="s">&#9749; Best for dining · +10%</span>
+                      <div class="t" data-en="AceWallet" data-ar="محفظة ايس">AceWallet</div>
+                      <span class="s" data-en="&#128757; Best for food delivery · +15%" data-ar="&#128757; الأفضل لتوصيل مطاعم · +15%">&#128757; Best for food delivery · +15%</span>
                     </div>
                     <div class="amt"><div class="l" data-en="Pay" data-ar="ادفع">Pay</div><div class="v">SAR 18.00</div></div>
                   </div>
@@ -734,16 +874,16 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
                   </div>
                   <div class="confirm">
                     <dotlottie-player id="dc" class="dc-glyph" src="assets/double-click.lottie" autoplay loop></dotlottie-player>
-                    <span class="label" id="payLabel">Confirm with Side Button</span>
+                    <span class="label" id="payLabel" data-en="Confirm with Side Button" data-ar="أكّد بالزر الجانبي">Confirm with Side Button</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
           <div class="hiw-cap">
-            <div class="row"><span class="num">04</span><h3 data-en="Confirm, and it&rsquo;s paid" data-ar="أكِّد، وتمّ الدفع">Confirm, and it&rsquo;s paid</h3></div>
+            <div class="row"><span class="num">04</span><h3 data-en="Confirm, and it&rsquo;s paid" data-ar="أكّد الدفع، وخلصنا">Confirm, and it&rsquo;s paid</h3></div>
             <p data-en="A glance or a press of the side button authorizes it — done, with the best card."
-               data-ar="نظرة أو ضغطة على الزر الجانبي تؤكّد العملية — وتمّ الدفع بأفضل بطاقة.">A glance or a press of the side button authorizes it — done, with the best card.</p>
+               data-ar="بنظرة للشاشة أو ضغطة زر تتأكد العملية — وكذا دفعت بأفضل بطاقة.">A glance or a press of the side button authorizes it — done, with the best card.</p>
           </div>
         </article>
       </div>
@@ -755,27 +895,27 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
     <div class="wrap">
       <div class="sec-head" data-reveal>
         <span class="sec-kicker" data-en="What you get" data-ar="ما الذي تحصل عليه">What you get</span>
-        <h2 class="sec-title"><span data-en="Earn more " data-ar="اكسب المزيد من "></span><span class="rot" id="getRot"></span><span data-en="." data-ar=".">.</span></h2>
-        <p class="sec-sub" data-en="On the cards you already carry — no new card, no new account." data-ar="على البطاقات التي تحملها أصلًا — دون بطاقة جديدة أو حساب جديد.">On the cards you already carry — no new card, no new account.</p>
+        <h2 class="sec-title"><span data-en="Earn more " data-ar="اكسب "></span><span class="rot" id="getRot"></span><span data-en="." data-ar=" أكثر.">.</span></h2>
+        <p class="sec-sub" data-en="On the cards you already carry." data-ar="من بطاقاتك اللي معك الحين.">On the cards you already carry.</p>
       </div>
 
       <div class="wyg-grid">
         <article class="wyg-card best" data-reveal>
           <span class="glow-border" aria-hidden="true"></span>
-          <h3 data-en="Never miss the highest reward." data-ar="لا تفوّت أعلى مكافأة.">Never miss the highest reward.</h3>
+          <h3 data-en="Never miss the highest reward." data-ar="لا تضيّع عليك أعلى مكافأة.">Never miss the highest reward.</h3>
           <p data-en="Every purchase goes on the card that pays the most — more cashback, more points, without tracking a thing."
-             data-ar="تُدفع كل عملية بالبطاقة التي تمنحك الأكثر — كاش باك أكثر ونقاط أكثر، دون أن تتابع شيئًا.">Every purchase goes on the card that pays the most — more cashback, more points, without tracking a thing.</p>
+             data-ar="كل عملية شراء بتنحسب على البطاقة اللي تعطيك أكثر — كاش باك أعلى، نقاط أكثر، وبدون ما تشيل هم المتابعة.">Every purchase goes on the card that pays the most — more cashback, more points, without tracking a thing.</p>
           <div class="wyg-visual" aria-hidden="true">
             <div class="rack" id="rack">
               <div class="rack-intent">
                 <span class="ri-for" data-en="Best for" data-ar="الأفضل لـ">Best for</span>
-                <span class="ri-cat"><i class="ph ph-coffee" id="rackIcon"></i><span class="ri-lbl">Coffee</span></span>
+                <span class="ri-cat"><i class="ph ph-moped" id="rackIcon"></i><span class="ri-lbl">Food delivery</span></span>
               </div>
               <div class="rack-list">
-                <div class="rk win" data-card="cashback" style="top:0px"><img src="cards/sab-cashback.png" alt="" loading="lazy" /><span class="rk-rate"><b class="rk-num">+10%</b></span></div>
-                <div class="rk" data-card="gamers" style="top:44px"><img src="cards/alrajhi-gamers.png" alt="" loading="lazy" /><span class="rk-rate"><b class="rk-num">+1%</b></span></div>
+                <div class="rk win" data-card="food" style="top:0px"><img src="cards/alrajhi-cashback-plus.png" alt="" loading="lazy" /><span class="rk-rate"><b class="rk-num">+15%</b></span></div>
+                <div class="rk" data-card="cashback" style="top:44px"><img src="cards/sab-cashback.png" alt="" loading="lazy" /><span class="rk-rate"><b class="rk-num">+10%</b></span></div>
                 <div class="rk" data-card="marriott" style="top:88px"><img src="cards/alrajhi-marriott.png" alt="" loading="lazy" /><span class="rk-rate"><b class="rk-num">+0.5%</b></span></div>
-                <div class="rk" data-card="food" style="top:132px"><img src="cards/alrajhi-cashback-plus.png" alt="" loading="lazy" /><span class="rk-rate"><b class="rk-num">+1%</b></span></div>
+                <div class="rk" data-card="alfursan" style="top:132px"><img src="cards/alfursan-alinma.png" alt="" loading="lazy" /><span class="rk-rate"><b class="rk-num">0×</b></span></div>
               </div>
             </div>
           </div>
@@ -785,14 +925,14 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
           <span class="glow-border" aria-hidden="true"></span>
           <h3 data-en="No new card, no new account." data-ar="لا بطاقة جديدة، ولا حساب جديد.">No new card, no new account.</h3>
           <p data-en="AceWallet works with the cards already in your wallet — nothing to apply for, nothing to switch."
-             data-ar="يعمل AceWallet مع البطاقات الموجودة في محفظتك — لا شيء تتقدّم له، ولا شيء تبدّله.">AceWallet works with the cards already in your wallet — nothing to apply for, nothing to switch.</p>
+             data-ar="محفظة ايس تشتغل مع بطاقاتك الموجودة في محفظتك أساساً — لا ترفع طلب، ولا تغيّر أي شيء.">AceWallet works with the cards already in your wallet — nothing to apply for, nothing to switch.</p>
           <div class="wyg-visual" aria-hidden="true">
-            <div class="fan">
-              <div class="fc fc0"><img src="cards/alfursan-alinma.png" alt="" loading="lazy" /></div>
-              <div class="fc fc1"><img src="cards/enbd-jarir-infinite.png" alt="" loading="lazy" /></div>
-              <div class="fc fc2"><img src="cards/sab-cashback.png" alt="" loading="lazy" /></div>
-              <div class="fc fc3"><img src="cards/alrajhi-marriott.png" alt="" loading="lazy" /></div>
-              <div class="fc fc4"><img src="cards/alrajhi-gamers.png" alt="" loading="lazy" /></div>
+            <div class="merge" aria-hidden="true">
+              <div class="mc mc0"><img src="cards/sab-cashback.png" alt="" loading="lazy" decoding="async" /></div>
+              <div class="mc mc1"><img src="cards/alrajhi-marriott.png" alt="" loading="lazy" decoding="async" /></div>
+              <div class="mc mc2"><img src="cards/enbd-jarir-infinite.png" alt="" loading="lazy" decoding="async" /></div>
+              <div class="mc mc3"><img src="cards/snb-alahli-premium.png" alt="" loading="lazy" decoding="async" /></div>
+              <div class="mc mc4"><img src="cards/alfursan-alinma.png" alt="" loading="lazy" decoding="async" /></div>
             </div>
           </div>
         </article>
@@ -804,10 +944,10 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
   <section class="closer" id="join">
     <div class="closer-in">
       <h2 class="closer-line" data-reveal>
-        <span data-en="Always play your " data-ar="الْعَب "></span><span class="ace" data-en="ace" data-ar="الآس">ace</span><span data-en="." data-ar=" دائمًا.">.</span>
+        <span data-en="Always play your " data-ar="في كل عملية، العب "></span><span class="ace" data-en="ace" data-ar="كبيرك">ace</span><span data-en="." data-ar=".">.</span>
       </h2>
-      <p data-reveal style="transition-delay:.06s" data-en="Stop leaving rewards on the table — ace every purchase."
-         data-ar="لا تترك مكافآتك على الطاولة — اكسب الأكثر من كل عملية شراء.">Stop leaving rewards on the table — ace every purchase.</p>
+      <p data-reveal style="transition-delay:.06s" data-en="What&rsquo;s gone is gone — don&rsquo;t let tomorrow&rsquo;s rewards slip away."
+         data-ar="اللي راح راح — لا تخلي مكافآت بكرة تضيع.">What&rsquo;s gone is gone — don&rsquo;t let tomorrow&rsquo;s rewards slip away.</p>
       <form class="signup" data-reveal style="transition-delay:.12s" novalidate>
         <div class="field">
           <label class="sr-only" data-en="Email address" data-ar="البريد الإلكتروني">Email address</label>
@@ -815,10 +955,10 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
                  data-ph-en="you@example.com" data-ph-ar="you@example.com" placeholder="you@example.com"
                  data-aria-en="Email address" data-aria-ar="البريد الإلكتروني" aria-label="Email address" />
         </div>
-        <button class="btn btn-primary" type="submit" data-en="Join the beta" data-ar="انضمّ إلى النسخة التجريبية">Join the beta</button>
+        <button class="btn btn-primary" type="submit" data-en="Join the waitlist" data-ar="انضم لقائمة الانتظار">Join the waitlist</button>
         <div class="form-foot" aria-live="polite">
-          <span class="micro" data-en="Free to join · no card details needed · launching soon."
-                data-ar="الانضمام مجاني · دون بيانات بطاقتك · ننطلق قريبًا.">Free to join · no card details needed · launching soon.</span>
+          <span class="micro" data-en="Completely free · no card details · launching soon."
+                data-ar="مجاني بالكامل. ما نطلب بيانات بطاقتك. إطلاقنا قرّب.">Free to join · no card details needed · launching soon.</span>
           <span class="msg"></span>
         </div>
       </form>
@@ -833,9 +973,9 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
     <nav class="foot-nav" aria-label="Footer">
       <a href="#how" data-en="How it works" data-ar="كيف يعمل">How it works</a>
       <a href="#get" data-en="What you get" data-ar="ما الذي تحصل عليه">What you get</a>
-      <a href="#join" data-en="Privacy" data-ar="الخصوصية">Privacy</a>
+      <a href="faq.html" data-en="FAQ" data-ar="الأسئلة الشائعة">FAQ</a>
     </nav>
-    <span class="tag" data-en="Always play your ace." data-ar="الْعَب الآس دائمًا.">Always play your ace.</span>
+    <span class="tag" data-en="Always play your ace." data-ar="في كل عملية، العب كبيرك.">Always play your ace.</span>
   </div>
 </footer>
 
@@ -850,6 +990,7 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var root = document.documentElement;
   var lang = (root.lang === 'ar') ? 'ar' : 'en';
+  try { var _svLang = localStorage.getItem('aw-lang'); if(_svLang === 'ar' || _svLang === 'en') lang = _svLang; } catch(e){}
 
   /* ---- localized strings authored for non-copy UI (form states) ---- */
   var UI = {
@@ -860,8 +1001,8 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
 
   /* ---- rotating words (locked copy, EN + AR) ---- */
   var ROT = {
-    hero:{ en:["dining","gaming","hotels","food delivery","flights","streaming"],
-           ar:["المطاعم","الألعاب","الفنادق","توصيل الطعام","الرحلات","البث"] },
+    hero:{ en:["food delivery","groceries","gaming","hotels","electronics","flights","spending abroad"],
+           ar:["توصيل مطاعم","البقالة","الألعاب","الفنادق","الإلكترونيات","الرحلات","مشترياتك الدولية"] },
     get: { en:["cashback","points","miles","rewards"],
            ar:["الكاش باك","النقاط","الأميال","المكافآت"] }
   };
@@ -871,6 +1012,7 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
     lang = next;
     root.lang = lang;
     root.dir  = (lang === 'ar') ? 'rtl' : 'ltr';
+    try { localStorage.setItem('aw-lang', lang); } catch(e){}
 
     document.querySelectorAll('[data-en]').forEach(function(el){
       var v = el.getAttribute('data-' + lang);
@@ -975,7 +1117,6 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
         input.classList.add('invalid'); setMsg('err', UI.formErr[lang]); input.focus(); return;
       }
       input.classList.remove('invalid');
-      // No backend yet — validate client-side and confirm. Wire to Formspree/Supabase later.
       setMsg('ok', UI.formOk[lang]);
       form.reset();
     });
@@ -1019,90 +1160,149 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
   var $ = function(id){ return document.getElementById(id); };
   var qsa = function(s){ return Array.prototype.slice.call(document.querySelectorAll(s)); };
 
-  /* REAL Saudi cards — each the genuine best card for that spend (rewards from the banks' own pages).
-     SAB Cashback leads as the everyday hero (up to 10% dining/groceries/fuel). */
-  var CARDS = {
-    cashback:    { src:'cards/sab-cashback.png' },         // SAB Cashback — up to 10% dining/groceries/fuel
-    gamers:      { src:'cards/alrajhi-gamers.png' },       // Al Rajhi Gamers
-    marriott:    { src:'cards/alrajhi-marriott.png' },     // Al Rajhi Marriott Bonvoy
-    cashbackplus:{ src:'cards/alrajhi-cashback-plus.png' },// Al Rajhi Signature Cashback+
-    alfursan:    { src:'cards/alfursan-alinma.png' },      // Alinma AlFursan (best miles rate)
-    streaming:   { src:'cards/bsf-signature.png' }         // BSF Visa Signature
+  /* every card we reference — REAL Saudi card art in /cards, real rewards from cards/_source/LIBRARY.md (no fakes) */
+  var CARD = {
+    cashplus:'cards/alrajhi-cashback-plus.png', // Food: 15% HungerStation, 10% dining
+    cashback:'cards/sab-cashback.png',          // Food/Cashback: up to 10% dining/supermarket/fuel
+    mazeed:'cards/enbd-mazeed-platinum.png',    // Food: 10% eateries, 5% groceries (premium cashback)
+    snbpremium:'cards/snb-alahli-premium.png',  // Food: 5% restaurants & food delivery (+11% fuel)
+    saibcash:'cards/saib-platinum-cashback.png',// Everyday: 0.5% other spend (general cashback card)
+    riyadcash:'cards/riyad-signature-cashback.png', // Grocery: tiered 5-10% groceries/dining/fuel/pharmacy
+    anbdigital:'cards/anb-cashback-digital.png',// Online: 0.5% local / 1% intl (general digital cashback)
+    gamers:'cards/alrajhi-gamers.png',          // Gaming: 10% online gaming
+    hilalwe:'cards/riyad-alhilal-we.png',       // Gaming: 10% e-gaming + Al-Hilal perks
+    hilal:'cards/riyad-alhilal-world.png',      // Gaming: 7.5% e-gaming
+    snbplay:'cards/snb-play.png',               // Gaming: 2x LAK points
+    marriott:'cards/alrajhi-marriott.png',      // Hotels: 6 Bonvoy pts/USD
+    anbworld:'cards/anb-world-elite.png',       // Hotels: GHA Titanium + Booking.com
+    albilad:'cards/albilad-signature.png',      // Hotels: Agoda/Luxury Hotel Collection
+    travelpass:'cards/albilad-travelpass.png',  // Travel bookings: 9 pts/SAR intl
+    jarir:'cards/enbd-jarir-infinite.png',      // Retail/Jarir: 2% at Jarir
+    jarirPlat:'cards/enbd-jarir-platinum.png',  // Retail/Jarir: 2% at Jarir
+    alfursan:'cards/alfursan-alinma.png',       // Flights: 1 mile/SAR intl
+    flynas:'cards/flynas-alrajhi.png',          // Flights: 1 mile/SAR 1.25 on flynas
+    alfursanriyad:'cards/alfursan-riyad.png',   // Flights: 1 mile/SAR 1.5 intl
+    alfursanbsf:'cards/alfursan-bsf.png',       // Flights: 1 mile/SAR 1.5 outside KSA
+    saib:'cards/saib-travel.png',               // FX: 100 currencies, 0% FX on loaded
+    alinma:'cards/alinma-traveler.png',         // FX: 30+ currencies
+    bsfcur:'cards/bsf-currencies.png',          // FX: 22 currencies
+    riyadcur:'cards/riyad-currencies.png'       // FX: 6 currencies
   };
-  var ORDER = ['dining','gaming','hotels','food','flights','streaming'];
-  var BEST = {                                             // [cardKey, displayReward, unitKey]
-    dining:    [['cashback','+10%','cashback']],
-    gaming:    [['gamers','+10%','cashback']],
-    hotels:    [['marriott','6×','points']],
-    food:      [['cashbackplus','+15%','cashback']],
-    flights:   [['alfursan','1','milePerSAR']],
-    streaming: [['streaming','50%','back']]
+  /* Real headline rewards from cards/_source/LIBRARY.md. */
+  var CARD_REWARD = {
+    cashplus:'15%', cashback:'10%', mazeed:'10%', snbpremium:'5%', saibcash:'0.5%', riyadcash:'5%', anbdigital:'1%',
+    gamers:'10%', hilalwe:'10%', hilal:'7.5%', snbplay:'2x',
+    marriott:'6x', anbworld:'7%', albilad:'12%', travelpass:'9 pts',
+    jarir:'2%', jarirPlat:'2%',
+    alfursan:'1mi/﷼1', flynas:'1mi/﷼1.25', alfursanriyad:'1mi/﷼1.5', alfursanbsf:'1mi/﷼1.5',
+    saib:'100 cur', alinma:'30 cur', bsfcur:'22 cur', riyadcur:'6 cur'
+  };
+  var ORDER = ['food','grocery','gaming','hotels','retail','flights','fx'];
+  /* Each category uses cards from that library category or its nearest real specialty. */
+  var DATA = {
+    food:    { card:'cashplus', reward:'+15%', unit:'cashback', rest:['mazeed','cashback','snbpremium'] },
+    grocery: { card:'cashback', reward:'10%',  unit:'cashback', rest:['mazeed','riyadcash','snbpremium'], restR:['5%','5%','5%'] },
+    gaming:  { card:'gamers',   reward:'+10%', unit:'cashback', rest:['hilalwe','hilal','snbplay'] },
+    hotels:  { card:'marriott', reward:'6x',   unit:'points',   rest:['anbworld','albilad','travelpass'] },
+    retail:  { card:'jarir',    reward:'2%',   unit:'cashback', rest:['jarirPlat','anbdigital','saibcash'] },
+    flights: { card:'alfursan', reward:'1',    unit:'milePerSAR', pill:'1mi/﷼1', rest:['flynas','alfursanriyad','alfursanbsf'] },
+    fx:      { card:'saib',     reward:'100',  unit:'currencies', pill:'100 cur', rest:['alinma','bsfcur','riyadcur'] }
   };
   var CAT_LABEL = {
-    dining:{en:'Dining',ar:'المطاعم'}, gaming:{en:'Gaming',ar:'الألعاب'}, hotels:{en:'Hotels',ar:'الفنادق'},
-    food:{en:'Food delivery',ar:'توصيل الطعام'}, flights:{en:'Flights',ar:'الرحلات'}, streaming:{en:'Streaming',ar:'البث'}
+    food:{en:'Food delivery',ar:'توصيل مطاعم'}, grocery:{en:'Groceries',ar:'البقالة'}, gaming:{en:'Gaming',ar:'الألعاب'}, hotels:{en:'Hotels',ar:'الفنادق'},
+    retail:{en:'Electronics',ar:'الإلكترونيات'}, flights:{en:'Flights',ar:'الرحلات'}, fx:{en:'Spending abroad',ar:'مشترياتك الدولية'}
+  };
+  var CAT_ICON = {
+    food:'ph-moped', grocery:'ph-shopping-cart', gaming:'ph-game-controller', hotels:'ph-bed',
+    retail:'ph-laptop', flights:'ph-airplane-tilt', fx:'ph-globe'
   };
   /* app-UI labels (localized; not marketing copy) */
   var STR = {
-    abSub:{en:'Best card to use',ar:'أفضل بطاقة للدفع'}, abMain:{en:'Right now',ar:'الآن'},
-    pickTag:{en:'Smart pick',ar:'اختيار ذكي'}, payCue:{en:'Double‑click to pay',ar:'اضغط مرّتين للدفع'}, earnLabel:{en:'You’ll earn',ar:'ستكسب'},
-    cashback:{en:'cashback',ar:'كاش باك'}, miles:{en:'miles',ar:'أميال'}, points:{en:'points',ar:'نقاط'}, back:{en:'back',ar:'استرداد'}, milePerSAR:{en:'mile / SAR 1',ar:'ميل لكل ريال'},
-    whyTpl:{en:'More than your other cards on ',ar:'أكثر من بطاقاتك الأخرى على '},
-    stLbl1:{en:'This month',ar:'هذا الشهر'}, stLbl2:{en:'Rewards earned',ar:'المكافآت'},
-    othersLbl:{en:'Other cards',ar:'بطاقات أخرى'}, manageLbl:{en:'Manage your cards',ar:'إدارة بطاقاتك'}
+    abSub:{en:'Best card for',ar:'البطاقة الأفضل لـ'}, walletSub:{en:'Your wallet',ar:'محفظتك'}, walletMain:{en:'Tap to pay',ar:'اضغط للدفع'},
+    cue:{en:'Double Click to Pay\nusing Ace',ar:'اضغط مرتين\nللدفع عبر Ace'},
+    payText:{en:'Hold near reader',ar:'قرّب الجهاز من القارئ'},
+    cashback:{en:'cashback',ar:'كاش باك'}, miles:{en:'miles',ar:'أميال'}, points:{en:'points',ar:'نقاط'}, back:{en:'back',ar:'استرداد'}, milePerSAR:{en:'mile / SAR 1',ar:'ميل لكل ريال'}, currencies:{en:'currencies',ar:'عملات'}
   };
 
-  var stage=$('pickStage'), wallet=$('wallet'),
-      heroMock=document.querySelector('.hero-mock'),
-      pickEl=document.querySelector('.hero-mock .pick'),
-      earnNum=$('earnNum'), earnUnit=$('earnUnit'), pickEarn=$('pickEarn'),
-      whyText=$('whyText'), pickTagEl=$('pickTag');
-  if(!wallet) return;
-  var wc={}; qsa('#wallet .wc').forEach(function(el){ wc[el.getAttribute('data-cat')]=el; });
+  var dev=document.querySelector('.hero-mock .device');   // journey state classes live here
+  var stack=$('stack'), bestImg=$('bestImg'), bestReward=$('bestReward'),
+      bestEl=stack&&stack.querySelector('.best'),
+      payText=$('payText'),
+      scText=$('scText'), abSub=$('abSub'), abMain=$('abMain');
+  if(!stack||!dev) return;
+  var restEls = qsa('#rest .r').map(function(el){ return el.querySelector('img'); });
+  var restTags = qsa('#restTags .rtag');
   var catBtns = qsa('#catRow .cat');
-  var LBL = { abSub:$('abSub'), abMain:$('abMain'), earnLabel:$('earnLabel') };
 
-  Object.keys(CARDS).forEach(function(k){ var im=new Image(); im.src=CARDS[k].src; });
+  Object.keys(CARD).forEach(function(k){ var im=new Image(); im.src=CARD[k]; });   // preload so swaps are instant
 
-  var lang=(document.documentElement.lang==='ar')?'ar':'en', idx=0, playing=!reduce && !still, driver=null, pt=[];
+  var lang=(document.documentElement.lang==='ar')?'ar':'en', idx=0,
+      playing=!reduce && !still, driver=null, resumeT=null,
+      introDone=false, hasPlayed=false, introTimers=[];
 
-  function clearPhases(){ pt.forEach(clearTimeout); pt=[]; }
-  function at(ms,fn){ pt.push(setTimeout(fn,ms)); }
-  function setActive(catId){ catBtns.forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-cat')===catId); }); }
-  function paintEarn(catId){ var w=BEST[catId][0]; earnNum.textContent=w[1]; earnUnit.textContent=STR[w[2]][lang];
-    whyText.textContent=STR.whyTpl[lang]+CAT_LABEL[catId][lang]; }
-  function resetVisual(){ stage.classList.remove('scanning'); wallet.classList.remove('engaged');
-    pickEl.classList.remove('revealed'); heroMock.classList.remove('paying');
-    Object.keys(wc).forEach(function(k){ wc[k].classList.remove('win'); }); }
+  function retrigger(el,cls){ if(!el) return; el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
 
-  /* the looping sequence: hand shown → "double-click to pay" → scan → the best card rises */
-  function runCycle(catId){
-    clearPhases(); resetVisual(); setActive(catId);
-    pickTagEl.textContent = STR.pickTag[lang];
-    at(650,  function(){ heroMock.classList.add('paying'); pickTagEl.textContent = STR.payCue[lang]; });
-    at(1500, function(){ wallet.classList.add('engaged'); });
-    at(1700, function(){ stage.classList.add('scanning'); });
-    at(2800, function(){ heroMock.classList.remove('paying'); wc[catId].classList.add('win');
-                         paintEarn(catId); pickEl.classList.add('revealed'); pickTagEl.textContent = STR.pickTag[lang]; });
+  /* paint = the WHOLE pick for a category, applied instantly (this is the interactivity) */
+  function paint(catId, animate){
+    var d=DATA[catId];
+    bestImg.src = CARD[d.card];
+    bestReward.innerHTML = '<i class="ph '+CAT_ICON[catId]+'"></i><span><small>'+(lang==='ar'?'الأفضل':'Best')+'</small><b>'+(d.pill||d.reward)+'</b></span>';
+    for(var i=0;i<3;i++){
+      var key=d.rest[i], img=restEls[i], tag=restTags[i], cardEl=img&&img.closest('.r');
+      if(key && CARD[key]){
+        img.src = CARD[key];
+        if(cardEl) cardEl.style.display = '';
+        if(tag){ tag.textContent = (d.restR && d.restR[i]) || CARD_REWARD[key]; tag.style.display = ''; }
+      } else {
+        if(img) img.removeAttribute('src');
+        if(cardEl) cardEl.style.display = 'none';
+        if(tag) tag.style.display = 'none';
+      }
+    }
+    abMain.textContent = CAT_LABEL[catId][lang];
+    catBtns.forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-cat')===catId); });
+    if(animate){ retrigger(bestEl,'swap'); }   // the new winner snaps into focus (rackFocus)
   }
-  function showStatic(catId){ clearPhases(); resetVisual(); setActive(catId); wc[catId].classList.add('win');
-    paintEarn(catId); pickEl.classList.add('revealed'); pickTagEl.textContent = STR.pickTag[lang]; }
 
-  function next(){ idx=(idx+1)%ORDER.length; runCycle(ORDER[idx]); }
-  function start(){ stop(); if(playing){ driver=setInterval(next, 5400); } }
-  function stop(){ if(driver){ clearInterval(driver); driver=null; } clearPhases(); }
+  function setHeader(state){
+    if(state==='open'){ abSub.textContent=STR.walletSub[lang]; abMain.textContent=STR.walletMain[lang]; }
+    else { abSub.textContent=STR.abSub[lang]; abMain.textContent=CAT_LABEL[ORDER[idx]][lang]; }
+  }
+
+  function tick(){ idx=(idx+1)%ORDER.length; paint(ORDER[idx], true); }
+  function start(){ stop(); if(playing){ driver=setInterval(tick, 2800); } }
+  function stop(){ if(driver){ clearInterval(driver); driver=null; } }
+  function pauseThenResume(){ stop(); if(resumeT) clearTimeout(resumeT); if(playing){ resumeT=setTimeout(start, 6000); } }
+
+  /* ---------------- the product JOURNEY ---------------- */
+  function setStep(s){ dev.classList.remove('preintro','step-open','step-pay','resolved'); dev.classList.add(s); }
+  function clearIntro(){ introTimers.forEach(clearTimeout); introTimers=[]; }
+  function iAt(ms,fn){ introTimers.push(setTimeout(fn,ms)); }
+  function resolveNow(){                                   // land in the live, interactive UI
+    clearIntro(); hasPlayed=true; setStep('resolved'); introDone=true;
+    paint(ORDER[idx], false); setHeader('resolved'); start();
+  }
+  function playIntro(){
+    if(hasPlayed) return; hasPlayed=true;
+    if(!playing){ resolveNow(); return; }                 // reduced-motion / ?still → straight to the pick
+    setStep('step-open'); setHeader('open');              // 1 · the wallet opens (cards rise, all crisp)
+    iAt(950,  function(){ setStep('step-pay'); });        // 2 · double-click to pay (rack into depth of field)
+    iAt(2200, resolveNow);                                // 3 · resolve to the pick + interactive UI
+    iAt(3700, function(){ if(!introDone) resolveNow(); });// safety net if a transition is dropped
+  }
 
   function applyLang(){
-    if(LBL.abSub) LBL.abSub.textContent=STR.abSub[lang];
-    if(LBL.abMain) LBL.abMain.textContent=STR.abMain[lang];
-    if(LBL.earnLabel) LBL.earnLabel.textContent=STR.earnLabel[lang];
-    paintEarn(ORDER[idx]);
-    if(pickEl.classList.contains('revealed')) pickTagEl.textContent=STR.pickTag[lang];
+    if(payText) payText.textContent=STR.payText[lang];
+    if(scText) scText.textContent=STR.cue[lang];
+    if(introDone){ paint(ORDER[idx], false); setHeader('resolved'); }
+    else { setHeader('open'); }
   }
 
+  /* tap a category → if mid-intro, fast-forward to the live UI; else re-pick instantly + pause auto-rotate */
   catBtns.forEach(function(b){ b.addEventListener('click', function(){
     idx=ORDER.indexOf(b.getAttribute('data-cat'));
-    if(playing){ runCycle(ORDER[idx]); start(); } else { showStatic(ORDER[idx]); }
+    if(!introDone){ resolveNow(); return; }
+    paint(ORDER[idx], true); pauseThenResume();
   }); });
 
   new MutationObserver(function(){
@@ -1111,7 +1311,19 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
   }).observe(document.documentElement, {attributes:true, attributeFilter:['lang']});
 
   applyLang();
-  if(playing){ runCycle(ORDER[0]); start(); } else { showStatic(ORDER[0]); }
+  /* play the journey once, when the hero first scrolls into view */
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting && e.intersectionRatio>=.4){ io.disconnect(); playIntro(); } });
+    }, {threshold:[.4]});
+    io.observe(document.querySelector('.hero-mock'));
+  } else { playIntro(); }
+  /* safety net: if the hero is on-screen but the observer never fires, play the journey anyway */
+  setTimeout(function(){
+    if(hasPlayed) return;
+    var r=document.querySelector('.hero-mock').getBoundingClientRect();
+    if(r.bottom>0 && r.top<(window.innerHeight||800)*0.85) playIntro();
+  }, 1300);
 })();
 </script>
 
@@ -1124,7 +1336,8 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
 const player = document.getElementById('dc');
 const label  = document.getElementById('payLabel');
 if(player && label){
-  const labelFor = (f) => f >= 80 ? 'Done' : (f >= 33 ? 'Processing Payment' : 'Confirm with Side Button');
+  const PAYL = {en:{d:'Done',p:'Processing Payment',c:'Confirm with Side Button'},ar:{d:'تمّ',p:'جارٍ معالجة الدفع',c:'أكّد بالزر الجانبي'}};
+  const labelFor = (f) => { const L=PAYL[document.documentElement.lang==='ar'?'ar':'en']; return f>=80?L.d:(f>=33?L.p:L.c); };
   let cur = '';
   function setText(t){
     if(t === cur) return;
@@ -1179,10 +1392,9 @@ if(player && label){
 
   /* spend categories → the same winning-hand logic as the hero (a different card wins each) */
   var CATS = [
-    {icon:'ph-fork-knife',      en:'Dining',        ar:'المطاعم',     rank:[['cashback','+10%'],['gamers','+1%'],['marriott','+0.5%'],['food','+1%']]},
-    {icon:'ph-game-controller', en:'Gaming',        ar:'الألعاب',     rank:[['gamers','+10%'],['cashback','+1%'],['marriott','+0.5%'],['food','+1%']]},
-    {icon:'ph-bed',             en:'Hotels',        ar:'الفنادق',     rank:[['marriott','6×'],['food','+1%'],['cashback','+1%'],['gamers','+0.5%']]},
-    {icon:'ph-moped',           en:'Food delivery', ar:'توصيل الطعام', rank:[['food','+15%'],['cashback','+1%'],['gamers','+1%'],['marriott','+0.5%']]}
+    {icon:'ph-moped',         en:'Food delivery', ar:'توصيل مطاعم', rank:[['food','+15%'],['cashback','+10%'],['alfursan','0×'],['marriott','0×']]},
+    {icon:'ph-bed',           en:'Hotels',        ar:'الفنادق',      rank:[['marriott','6×'],['cashback','1%'],['food','1%'],['alfursan','0×']]},
+    {icon:'ph-airplane-tilt', en:'Flights',         ar:'الرحلات',         rank:[['alfursan','1 mi'],['cashback','1%'],['marriott','0×'],['food','0×']]}
   ];
   var i = 0, timer = null, started = false, ROW = 44;
   function lang(){ return document.documentElement.lang === 'ar' ? 'ar' : 'en'; }

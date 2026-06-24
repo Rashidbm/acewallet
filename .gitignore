@@ -1,0 +1,28 @@
+# Agent / editor tooling
+.claude/
+.agents/
+.codex/
+.aidesigner/
+.mcp.json
+
+# Source art + build tooling (not part of the deployed site)
+cards/_source/
+tools/
+
+# Prototype / scratch pages
+confirm.html
+iphone.html
+step1.html
+step2.html
+step2-lottie.html
+step2-sheet-layout.html
+step3.html
+step4.html
+wyg-aidesigner-ref.html
+
+# Working docs
+ACEWALLET-BRIEF.md
+HANDOFF.md
+
+# OS cruft
+.DS_Store

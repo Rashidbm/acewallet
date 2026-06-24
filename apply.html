@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<meta name="description" content="Apply for the AceWallet beta — tell us a bit about yourself and join the waitlist." />
+<title>AceWallet · Apply for the beta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+/* AceWallet — Apply for the beta. Shares the landing page's dark/emerald system. */
+:root{
+  --bg:#0A0A0C; --surface:#141417;
+  --border:rgba(255,255,255,.08); --border-2:rgba(255,255,255,.13);
+  --text:#ECECEE; --muted:#8A8A90; --faint:#5a5a61;
+  --emerald:#2BD17E; --emerald-ink:#06160F;
+  --ease:cubic-bezier(.4,0,.2,1); --ease-out:cubic-bezier(.16,1,.3,1);
+  --en:'Inter', system-ui, -apple-system, sans-serif;
+  --ar:'IBM Plex Sans Arabic', 'Inter', system-ui, sans-serif;
+  --maxw:1180px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; -webkit-text-size-adjust:100%}
+body{margin:0; background:var(--bg); color:var(--text); font-family:var(--en);
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; line-height:1.55; overflow-x:hidden;
+  min-height:100vh; display:flex; flex-direction:column}
+html[lang="ar"] body{font-family:var(--ar)}
+a{color:inherit; text-decoration:none}
+button{font-family:inherit}
+::selection{background:rgba(43,209,126,.28); color:#fff}
+:focus-visible{outline:2px solid var(--emerald); outline-offset:2px; border-radius:6px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* buttons */
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; font-weight:600; font-size:15px; line-height:1;
+  cursor:pointer; border:0; border-radius:999px; padding:14px 22px; white-space:nowrap; font-family:inherit;
+  transition:transform .14s var(--ease), box-shadow .22s var(--ease), background .2s, filter .2s}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--emerald); color:var(--emerald-ink); box-shadow:0 8px 24px -8px rgba(43,209,126,.55)}
+.btn-primary:hover{filter:brightness(1.05); box-shadow:0 12px 34px -8px rgba(43,209,126,.65)}
+.btn-sm{padding:9px 15px; font-size:13.5px}
+
+/* nav */
+.nav{position:sticky; top:0; z-index:50; border-bottom:1px solid var(--border);
+  background:rgba(10,10,12,.72); backdrop-filter:blur(16px) saturate(150%); -webkit-backdrop-filter:blur(16px) saturate(150%)}
+.nav-in{display:flex; align-items:center; gap:18px; height:64px; max-width:var(--maxw); margin:0 auto; padding:0 24px}
+.brand{font-weight:600; font-size:17px; letter-spacing:-.02em; color:var(--text)}
+.nav-links{display:flex; gap:26px; margin-inline-start:14px}
+.nav-links a{color:var(--muted); font-size:14px; font-weight:500; transition:color .2s}
+.nav-links a:hover,.nav-links a.active{color:var(--text)}
+.nav-right{margin-inline-start:auto; display:flex; align-items:center; gap:10px}
+.lang-btn{background:rgba(255,255,255,.05); color:var(--text); border:1px solid var(--border-2);
+  border-radius:999px; padding:8px 14px; font-size:13px; font-weight:600; cursor:pointer; transition:background .2s; min-width:74px}
+.lang-btn:hover{background:rgba(255,255,255,.1)}
+@media(max-width:740px){ .nav-links{display:none} }
+
+/* apply form */
+.apply-wrap{flex:1 0 auto; width:100%; max-width:620px; margin:0 auto; padding:0 24px}
+.apply-head{text-align:center; padding:72px 0 40px}
+.apply-kicker{display:block; font-size:12px; font-weight:600; color:var(--muted); margin:0 0 16px; letter-spacing:.16em; text-transform:uppercase}
+html[lang="ar"] .apply-kicker{letter-spacing:0}
+.apply-title{font-size:clamp(30px,4.6vw,44px); font-weight:600; letter-spacing:-.03em; line-height:1.05; margin:0}
+html[lang="ar"] .apply-title{ line-height:1.3; letter-spacing:0 }
+.apply-sub{margin:16px auto 0; color:var(--muted); font-size:clamp(15px,1.6vw,17px); max-width:42ch; line-height:1.6}
+
+form.apply{padding-bottom:90px}
+.fld{margin-bottom:26px}
+.fld-label{display:block; font-size:15px; font-weight:600; margin:0 0 11px; color:var(--text)}
+.fld-label .opt{color:var(--faint); font-weight:400; font-size:13px; margin-inline-start:6px}
+.txt{width:100%; height:54px; padding:0 16px; border-radius:13px; border:1px solid var(--border-2);
+  background:rgba(255,255,255,.04); color:var(--text); font-size:15.5px; font-family:inherit; transition:border-color .2s, box-shadow .2s, background .2s}
+.txt::placeholder{color:#6c6c73}
+.txt:focus{outline:none; border-color:rgba(43,209,126,.65); background:rgba(255,255,255,.06); box-shadow:0 0 0 3px rgba(43,209,126,.16)}
+.txt.invalid{border-color:rgba(255,107,107,.7); box-shadow:0 0 0 3px rgba(255,107,107,.13)}
+textarea.txt{height:auto; min-height:108px; padding:14px 16px; resize:vertical; line-height:1.6}
+html[lang="ar"] .txt{font-family:var(--ar)}
+
+.pills{display:flex; flex-wrap:wrap; gap:10px}
+.pill{flex:1 1 0; min-width:80px; height:54px; display:inline-flex; align-items:center; justify-content:center; border-radius:13px;
+  border:1px solid var(--border-2); background:rgba(255,255,255,.03); color:var(--muted); font-size:15px; font-weight:500;
+  cursor:pointer; transition:border-color .18s, background .18s, color .18s; font-family:inherit}
+.pill:hover{color:var(--text); background:rgba(255,255,255,.06)}
+.pill.sel{border-color:rgba(43,209,126,.6); background:rgba(43,209,126,.1); color:var(--emerald); box-shadow:inset 0 0 0 1px rgba(43,209,126,.42)}
+/* numeric ranges (1–2, 4–5, 6+) must stay LTR or RTL reverses them to 2–1, +6 */
+html[dir="rtl"] .pills[data-group="cards"] .pill{ direction:ltr }
+
+.apply-actions{margin-top:34px}
+.apply-actions .btn{width:100%; height:54px; font-size:16px}
+.apply-msg{min-height:20px; margin-top:14px; text-align:center; font-size:13.5px; font-weight:500}
+.apply-msg.err{color:#ff8a8a}
+.apply-fineprint{margin-top:14px; text-align:center; color:var(--faint); font-size:13px}
+
+/* success state */
+.apply-done{display:none; text-align:center; padding:30px 0 90px}
+.apply-done.show{display:block}
+.apply-done .check{width:72px; height:72px; margin:0 auto 22px; border-radius:50%; display:grid; place-items:center;
+  background:rgba(43,209,126,.12); border:1px solid rgba(43,209,126,.4)}
+.apply-done .check svg{width:34px; height:34px; color:var(--emerald)}
+.apply-done h2{font-size:clamp(24px,3.4vw,32px); font-weight:600; letter-spacing:-.02em; margin:0}
+.apply-done p{color:var(--muted); font-size:16px; margin:14px auto 26px; max-width:40ch; line-height:1.6}
+
+/* footer */
+.foot{flex:none; border-top:1px solid var(--border); padding:38px 0}
+.foot-in{display:flex; flex-wrap:wrap; align-items:center; gap:16px 28px; max-width:var(--maxw); margin:0 auto; padding:0 24px}
+.foot-nav{display:flex; flex-wrap:wrap; gap:22px}
+.foot-nav a{color:var(--muted); font-size:14px; transition:color .2s}
+.foot-nav a:hover,.foot-nav a.active{color:var(--text)}
+.foot .tag{margin-inline-start:auto; color:var(--faint); font-size:13.5px}
+</style>
+</head>
+
+<body>
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="index.html" aria-label="AceWallet home">AceWallet</a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="index.html#how" data-en="How it works" data-ar="كيف يعمل">How it works</a>
+      <a href="index.html#get" data-en="What you get" data-ar="ما الذي تحصل عليه">What you get</a>
+      <a href="faq.html" data-en="FAQ" data-ar="الأسئلة الشائعة">FAQ</a>
+    </nav>
+    <div class="nav-right">
+      <button class="lang-btn" id="langBtn" type="button" aria-label="Switch language">العربية</button>
+    </div>
+  </div>
+</header>
+
+<main class="apply-wrap">
+  <section class="apply-head">
+    <span class="apply-kicker" data-en="Priority access" data-ar="أولوية التجربة">Priority access</span>
+    <h1 class="apply-title" data-en="Get an invite to the beta." data-ar="احصل على دعوة للنسخة التجريبية.">Get an invite to the beta.</h1>
+    <p class="apply-sub" data-en="Enter your details to be among the first to try it." data-ar="سجل بياناتك عشان تكون من أوائل اللي يجربونها.">Enter your details to be among the first to try it.</p>
+  </section>
+
+  <form class="apply" id="applyForm" novalidate>
+    <!-- Full name -->
+    <div class="fld">
+      <label class="fld-label" for="fName" data-en="Full name" data-ar="الاسم الكامل">Full name</label>
+      <input class="txt" id="fName" name="name" type="text" autocomplete="name"
+             data-ph-en="Your name" data-ph-ar="اسمك" placeholder="Your name" />
+    </div>
+
+    <!-- Email -->
+    <div class="fld">
+      <label class="fld-label" for="fEmail" data-en="Email" data-ar="البريد الإلكتروني">Email</label>
+      <input class="txt" id="fEmail" name="email" type="email" inputmode="email" autocomplete="email" required
+             data-ph-en="you@example.com" data-ph-ar="you@example.com" placeholder="you@example.com" />
+    </div>
+
+    <!-- Device -->
+    <div class="fld">
+      <span class="fld-label" data-en="Which device do you use?" data-ar="أي جهاز تستخدم؟">Which device do you use?</span>
+      <div class="pills" data-group="device" role="group">
+        <button type="button" class="pill" data-val="iOS" data-en="iOS" data-ar="آيفون">iOS</button>
+        <button type="button" class="pill" data-val="Android" data-en="Android" data-ar="أندرويد">Android</button>
+      </div>
+    </div>
+
+    <!-- Cards count -->
+    <div class="fld">
+      <span class="fld-label" data-en="How many cards are in your wallet?" data-ar="كم بطاقة عندك في محفظتك؟">How many cards are in your wallet?</span>
+      <div class="pills" data-group="cards" role="group">
+        <button type="button" class="pill" data-val="1-2">1–2</button>
+        <button type="button" class="pill" data-val="3">3</button>
+        <button type="button" class="pill" data-val="4-5">4–5</button>
+        <button type="button" class="pill" data-val="6+">6+</button>
+      </div>
+    </div>
+
+    <!-- Investor -->
+    <div class="fld">
+      <span class="fld-label"><span data-en="An investor interested in learning more?" data-ar="مستثمر ومهتم تعرف تفاصيل أكثر؟">An investor interested in learning more?</span> <span class="opt" data-en="(optional)" data-ar="(اختياري)">(optional)</span></span>
+      <div class="pills" data-group="investor" role="group">
+        <button type="button" class="pill" data-val="Yes" data-en="Yes" data-ar="نعم">Yes</button>
+        <button type="button" class="pill" data-val="No" data-en="No" data-ar="لا">No</button>
+      </div>
+    </div>
+
+    <!-- Message -->
+    <div class="fld">
+      <label class="fld-label" for="fMsg"><span data-en="Anything else you'd like to add?" data-ar="حاب تضيف شيء ثاني؟">Anything else you'd like to add?</span> <span class="opt" data-en="(optional)" data-ar="(اختياري)">(optional)</span></label>
+      <textarea class="txt" id="fMsg" name="message" rows="3"
+                data-ph-en="Your wallet habits, what excites you, or anything else — totally optional."
+                data-ph-ar="عاداتك في الدفع، وش يحمّسك، أو أي شي ثاني — كله اختياري." placeholder="Your wallet habits, what excites you, or anything else — totally optional."></textarea>
+    </div>
+
+    <div class="apply-actions">
+      <button class="btn btn-primary" type="submit" data-en="Join the beta" data-ar="انضمّ إلى النسخة التجريبية">Join the beta</button>
+      <div class="apply-msg" id="applyMsg" aria-live="polite"></div>
+      <p class="apply-fineprint" data-en="Free · no card details · we'll only email you about the beta." data-ar="مجاني · دون بيانات بطاقتك · بنراسلك فقط بخصوص النسخة التجريبية.">Free · no card details · we'll only email you about the beta.</p>
+    </div>
+  </form>
+
+  <section class="apply-done" id="applyDone">
+    <div class="check" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+    </div>
+    <h2 data-en="You're on the list." data-ar="تمّ تسجيلك في القائمة.">You're on the list.</h2>
+    <p data-en="Thanks — we'll email you the moment your beta spot opens up." data-ar="شكراً — بنراسلك أول ما يجهز دورك في النسخة التجريبية.">Thanks — we'll email you the moment your beta spot opens up.</p>
+    <a class="btn btn-primary" href="index.html" data-en="Back to home" data-ar="العودة للرئيسية">Back to home</a>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="foot-in">
+    <a class="brand" href="index.html" aria-label="AceWallet home">AceWallet</a>
+    <nav class="foot-nav" aria-label="Footer">
+      <a href="index.html#how" data-en="How it works" data-ar="كيف يعمل">How it works</a>
+      <a href="index.html#get" data-en="What you get" data-ar="ما الذي تحصل عليه">What you get</a>
+      <a href="faq.html" data-en="FAQ" data-ar="الأسئلة الشائعة">FAQ</a>
+    </nav>
+    <span class="tag" data-en="Always play your ace." data-ar="في كل مرة، نزّل الأكّة.">Always play your ace.</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var root = document.documentElement;
+  var KEY = 'aw-lang';
+  var langBtn = document.getElementById('langBtn');
+  var lang = 'en';
+  try { var sv = localStorage.getItem(KEY); if(sv === 'ar' || sv === 'en') lang = sv; } catch(e){}
+
+  function applyLang(next){
+    lang = next; root.lang = lang; root.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+    document.querySelectorAll('[data-en]').forEach(function(el){
+      var v = el.getAttribute('data-' + lang); if(v != null) el.textContent = v;
+    });
+    document.querySelectorAll('[data-ph-en]').forEach(function(el){
+      el.placeholder = el.getAttribute('data-ph-' + lang) || '';
+    });
+    langBtn.textContent = (lang === 'ar') ? 'English' : 'العربية';
+    langBtn.setAttribute('aria-label', lang === 'ar' ? 'التبديل إلى الإنجليزية' : 'Switch to Arabic');
+    try { localStorage.setItem(KEY, lang); } catch(e){}
+  }
+  langBtn.addEventListener('click', function(){ applyLang(lang === 'ar' ? 'en' : 'ar'); });
+
+  // pill groups behave like radios
+  document.querySelectorAll('.pills').forEach(function(group){
+    group.addEventListener('click', function(e){
+      var b = e.target.closest('.pill'); if(!b) return;
+      group.querySelectorAll('.pill').forEach(function(p){ p.classList.toggle('sel', p === b); });
+    });
+  });
+
+  // prefill email passed from the landing page (?email=...)
+  try {
+    var em = new URLSearchParams(location.search).get('email');
+    if(em){ document.getElementById('fEmail').value = em; }
+  } catch(e){}
+
+  // submit (client-side only — wire to Formspree/Supabase later)
+  var EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  var form = document.getElementById('applyForm');
+  var msg = document.getElementById('applyMsg');
+  var name = document.getElementById('fName');
+  var email = document.getElementById('fEmail');
+  var STR = {
+    needName:{en:'Please enter your name.', ar:'فضلاً أدخل اسمك.'},
+    needEmail:{en:'Please enter a valid email.', ar:'فضلاً أدخل بريداً إلكترونياً صحيحاً.'}
+  };
+  function fail(field, key){ field.classList.add('invalid'); msg.textContent = STR[key][lang]; msg.className = 'apply-msg err'; field.focus(); }
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    msg.textContent = ''; msg.className = 'apply-msg';
+    if(!EMAIL.test((email.value || '').trim())){ return fail(email, 'needEmail'); }
+    name.classList.remove('invalid'); email.classList.remove('invalid');
+    form.style.display = 'none';
+    document.getElementById('applyDone').classList.add('show');
+    window.scrollTo({top:0, behavior:'auto'});
+  });
+  [name, email].forEach(function(f){ f.addEventListener('input', function(){ f.classList.remove('invalid'); msg.textContent=''; msg.className='apply-msg'; }); });
+
+  applyLang(lang);
+})();
+</script>
+</body>
+</html>
