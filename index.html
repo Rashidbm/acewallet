@@ -279,6 +279,9 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
 @keyframes hero-glow{ 0%,100%{opacity:.55} 50%{opacity:.9} }
 @keyframes hero-dot{ 0%,100%{opacity:.4; transform:scale(.8)} 50%{opacity:1; transform:scale(1)} }
 @keyframes hero-sheen{ 0%,72%{transform:translateX(-190%) skewX(-9deg)} 86%,100%{transform:translateX(320%) skewX(-9deg)} }
+/* hero "pick" sequence — the scan-line sweeps the hand; the side button double-pulses */
+@keyframes scanSweep{ 0%{transform:translateX(0); opacity:0} 14%{opacity:1} 84%{opacity:1} 100%{transform:translateX(316px); opacity:0} }
+@keyframes sidePulse{ 0%,100%{box-shadow:none} 50%{box-shadow:-3px 0 13px 3px rgba(43,209,126,.85), 0 0 0 3px rgba(43,209,126,.35)} }
 
 /* ============================================================================
    @scope — HERO mockup (inlined verbatim from iphone.html).
@@ -322,21 +325,27 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
   .pick-stage{position:relative; height:226px; margin-top:16px; display:grid; place-items:center; perspective:1000px}
   .pick-glow{position:absolute; z-index:0; width:250px; height:200px; border-radius:50%; pointer-events:none; opacity:.7;
     background:radial-gradient(closest-side, rgba(43,209,126,.34), transparent 70%); filter:blur(9px)}
-  /* your OTHER real cards, softly blurred behind the pick — "we weighed your whole wallet" */
-  .pick-behind{position:absolute; top:50%; left:50%; z-index:1; width:218px; border-radius:14px; overflow:hidden; pointer-events:none;
-    filter:blur(3px) brightness(.58) saturate(.9); opacity:.85; box-shadow:0 16px 36px -16px rgba(0,0,0,.9)}
-  .pick-behind img{width:100%; display:block; border-radius:14px}
-  .pick-behind.pb1{transform:translate(-50%,-50%) translate(-48px,-30px) rotate(-10deg) scale(.88)}
-  .pick-behind.pb2{transform:translate(-50%,-50%) translate(48px,-30px)  rotate(10deg)  scale(.88)}
-  .pick-behind.pb3{transform:translate(-50%,-50%) translate(0px,-46px)   rotate(0deg)   scale(.8)}
-  .pick-card{position:relative; z-index:3; width:236px; transform-style:preserve-3d; border-radius:15px;
-    box-shadow:0 30px 56px -18px rgba(0,0,0,.9)}
-  .pick-card img{width:100%; display:block; border-radius:15px}
-  .pick-ring{position:absolute; inset:-6px; border-radius:20px; pointer-events:none;
-    border:1.5px solid rgba(43,209,126,.7); box-shadow:0 0 0 4px rgba(43,209,126,.08), 0 0 32px rgba(43,209,126,.36)}
-  .pick-sheen{position:absolute; inset:0; border-radius:15px; overflow:hidden; pointer-events:none}
-  .pick-sheen::after{content:""; position:absolute; top:-25%; bottom:-25%; left:0; width:52%;
-    background:linear-gradient(108deg, transparent, rgba(255,255,255,.24) 50%, transparent); transform:translateX(-190%) skewX(-9deg)}
+
+  /* THE WALLET — your real cards fanned like a hand; AceWallet scans them and the best one rises out */
+  .wallet{position:absolute; inset:0}
+  .wc{position:absolute; left:50%; bottom:16px; width:132px; margin-left:-66px; transform-origin:50% 150%;
+    transition:transform .7s var(--ease-out), filter .55s var(--ease), opacity .55s var(--ease)}
+  .wc img{width:100%; display:block; border-radius:11px; box-shadow:0 16px 30px -14px rgba(0,0,0,.85)}
+  .wc.c0{transform:rotate(-21deg)   translateX(-80px) translateY(10px); z-index:2}
+  .wc.c1{transform:rotate(-12.6deg) translateX(-48px) translateY(2px);  z-index:4}
+  .wc.c2{transform:rotate(-4.2deg)  translateX(-16px) translateY(-3px); z-index:6}
+  .wc.c3{transform:rotate(4.2deg)   translateX(16px)  translateY(-3px); z-index:5}
+  .wc.c4{transform:rotate(12.6deg)  translateX(48px)  translateY(2px);  z-index:3}
+  .wc.c5{transform:rotate(21deg)    translateX(80px)  translateY(10px); z-index:1}
+  .wallet.engaged .wc:not(.win){filter:grayscale(1) brightness(.42); opacity:.6}
+  .wc.win{transform:translateX(0) translateY(-44px) rotate(0deg) scale(1.16); z-index:20; filter:none; opacity:1}
+  .wc.win::after{content:""; position:absolute; inset:-5px; border-radius:16px; pointer-events:none;
+    border:1.6px solid rgba(43,209,126,.9); box-shadow:0 0 0 4px rgba(43,209,126,.10), 0 0 30px rgba(43,209,126,.42)}
+
+  /* the scan-line that sweeps the hand before the pick */
+  .scan{position:absolute; top:14%; bottom:34%; left:0; z-index:15; width:48px; margin-left:-24px; pointer-events:none; opacity:0;
+    background:linear-gradient(90deg, transparent, rgba(120,255,194,.55), transparent); filter:blur(5px)}
+  .pick-stage.scanning .scan{animation:scanSweep 1.05s var(--ease) forwards}
 
   .pick-earn{margin-top:26px}
   .earn-label{font-size:11.5px; color:var(--muted)}
@@ -354,13 +363,12 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
   .cat:hover{color:var(--muted)}
   .cat.active{color:var(--emerald); background:rgba(43,209,126,.14); box-shadow:inset 0 0 0 1px rgba(43,209,126,.42)}
 
-  /* motion: the card floats in 3D depth, the glow breathes, a sheen sweeps, the swap crossfades */
-  .pick-card.swap img{animation:cardSwap .42s ease}
-  .pick-earn.swap{animation:cardSwap .42s ease}
+  /* reveal the reward only at the moment of the pick; the side button pulses on the "double-click to pay" beat */
+  .pick .pick-earn, .pick .pick-why{opacity:0; transition:opacity .45s var(--ease)}
+  .pick.revealed .pick-earn, .pick.revealed .pick-why{opacity:1}
+  .hero-mock.paying .btn-side.power{animation:sidePulse .42s ease 0s 2}
   @media (prefers-reduced-motion: no-preference){
-    .pick-card{animation:hero-float 7s ease-in-out infinite}
     .pick-glow{animation:hero-glow 5s ease-in-out infinite}
-    .pick-sheen::after{animation:hero-sheen 7.5s ease-in-out 1.6s infinite}
   }
   .home-ind{position:absolute; bottom:9px; left:50%; transform:translateX(-50%); width:128px; height:5px; border-radius:3px; background:rgba(255,255,255,.5); z-index:22}
 }
@@ -567,16 +575,17 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
                 </div>
                 <div class="pick">
                   <span class="pick-tag"><span id="pickTag">Smart pick</span></span>
-                  <div class="pick-stage">
+                  <div class="pick-stage" id="pickStage">
                     <span class="pick-glow"></span>
-                    <div class="pick-behind pb1" aria-hidden="true"><img src="cards/sab-premier.png" alt="" /></div>
-                    <div class="pick-behind pb2" aria-hidden="true"><img src="cards/private-infinite.png" alt="" /></div>
-                    <div class="pick-behind pb3" aria-hidden="true"><img src="cards/alrajhi-salaries.png" alt="" /></div>
-                    <div class="pick-card" id="pickCard">
-                      <img id="pickImg" src="cards/sab-cashback.png" alt="Best card for the selected category" />
-                      <span class="pick-ring"></span>
-                      <span class="pick-sheen"></span>
+                    <div class="wallet" id="wallet">
+                      <div class="wc c0" data-cat="dining"    aria-hidden="true"><img src="cards/sab-cashback.png" alt="" /></div>
+                      <div class="wc c1" data-cat="gaming"    aria-hidden="true"><img src="cards/alrajhi-gamers.png" alt="" /></div>
+                      <div class="wc c2" data-cat="hotels"    aria-hidden="true"><img src="cards/alrajhi-marriott.png" alt="" /></div>
+                      <div class="wc c3" data-cat="food"      aria-hidden="true"><img src="cards/alrajhi-cashback-plus.png" alt="" /></div>
+                      <div class="wc c4" data-cat="flights"   aria-hidden="true"><img src="cards/alfursan-alinma.png" alt="" /></div>
+                      <div class="wc c5" data-cat="streaming" aria-hidden="true"><img src="cards/bsf-signature.png" alt="" /></div>
                     </div>
+                    <span class="scan" aria-hidden="true"></span>
                   </div>
                   <div class="pick-earn" id="pickEarn">
                     <div class="earn-label" id="earnLabel">You&rsquo;ll earn</div>
@@ -1036,48 +1045,64 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
   /* app-UI labels (localized; not marketing copy) */
   var STR = {
     abSub:{en:'Best card to use',ar:'أفضل بطاقة للدفع'}, abMain:{en:'Right now',ar:'الآن'},
-    pickTag:{en:'Smart pick',ar:'اختيار ذكي'}, earnLabel:{en:'You’ll earn',ar:'ستكسب'},
+    pickTag:{en:'Smart pick',ar:'اختيار ذكي'}, payCue:{en:'Double‑click to pay',ar:'اضغط مرّتين للدفع'}, earnLabel:{en:'You’ll earn',ar:'ستكسب'},
     cashback:{en:'cashback',ar:'كاش باك'}, miles:{en:'miles',ar:'أميال'}, points:{en:'points',ar:'نقاط'}, back:{en:'back',ar:'استرداد'}, milePerSAR:{en:'mile / SAR 1',ar:'ميل لكل ريال'},
     whyTpl:{en:'More than your other cards on ',ar:'أكثر من بطاقاتك الأخرى على '},
     stLbl1:{en:'This month',ar:'هذا الشهر'}, stLbl2:{en:'Rewards earned',ar:'المكافآت'},
     othersLbl:{en:'Other cards',ar:'بطاقات أخرى'}, manageLbl:{en:'Manage your cards',ar:'إدارة بطاقاتك'}
   };
 
-  var pickImg=$('pickImg'), pickCard=$('pickCard'), earnNum=$('earnNum'), earnUnit=$('earnUnit'),
-      pickEarn=$('pickEarn'), whyText=$('whyText');
-  if(!pickImg) return;
+  var stage=$('pickStage'), wallet=$('wallet'),
+      heroMock=document.querySelector('.hero-mock'),
+      pickEl=document.querySelector('.hero-mock .pick'),
+      earnNum=$('earnNum'), earnUnit=$('earnUnit'), pickEarn=$('pickEarn'),
+      whyText=$('whyText'), pickTagEl=$('pickTag');
+  if(!wallet) return;
+  var wc={}; qsa('#wallet .wc').forEach(function(el){ wc[el.getAttribute('data-cat')]=el; });
   var catBtns = qsa('#catRow .cat');
-  var LBL = { abSub:$('abSub'), abMain:$('abMain'), pickTag:$('pickTag'), earnLabel:$('earnLabel') };
+  var LBL = { abSub:$('abSub'), abMain:$('abMain'), earnLabel:$('earnLabel') };
 
   Object.keys(CARDS).forEach(function(k){ var im=new Image(); im.src=CARDS[k].src; });
 
-  var lang=(document.documentElement.lang==='ar')?'ar':'en', idx=0, playing=!reduce && !still, timer=null;
+  var lang=(document.documentElement.lang==='ar')?'ar':'en', idx=0, playing=!reduce && !still, driver=null, pt=[];
 
-  function fmt(v){ return /%$/.test(v) ? '+'+v : v; }                 // "5%"->"+5%", "3×" stays
-  function unitFor(v){ return /×$/.test(v) ? STR.miles[lang] : STR.cashback[lang]; }
-  function retrigger(el, cls){ el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
-  function paint(catId){
-    var rows = BEST[catId], win = rows[0];
-    pickImg.src      = CARDS[win[0]].src;
-    earnNum.textContent = win[1];
-    earnUnit.textContent= STR[win[2]][lang];
-    whyText.textContent = STR.whyTpl[lang] + CAT_LABEL[catId][lang];
-    catBtns.forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-cat')===catId); });
+  function clearPhases(){ pt.forEach(clearTimeout); pt=[]; }
+  function at(ms,fn){ pt.push(setTimeout(fn,ms)); }
+  function setActive(catId){ catBtns.forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-cat')===catId); }); }
+  function paintEarn(catId){ var w=BEST[catId][0]; earnNum.textContent=w[1]; earnUnit.textContent=STR[w[2]][lang];
+    whyText.textContent=STR.whyTpl[lang]+CAT_LABEL[catId][lang]; }
+  function resetVisual(){ stage.classList.remove('scanning'); wallet.classList.remove('engaged');
+    pickEl.classList.remove('revealed'); heroMock.classList.remove('paying');
+    Object.keys(wc).forEach(function(k){ wc[k].classList.remove('win'); }); }
+
+  /* the looping sequence: hand shown → "double-click to pay" → scan → the best card rises */
+  function runCycle(catId){
+    clearPhases(); resetVisual(); setActive(catId);
+    pickTagEl.textContent = STR.pickTag[lang];
+    at(650,  function(){ heroMock.classList.add('paying'); pickTagEl.textContent = STR.payCue[lang]; });
+    at(1500, function(){ wallet.classList.add('engaged'); });
+    at(1700, function(){ stage.classList.add('scanning'); });
+    at(2800, function(){ heroMock.classList.remove('paying'); wc[catId].classList.add('win');
+                         paintEarn(catId); pickEl.classList.add('revealed'); pickTagEl.textContent = STR.pickTag[lang]; });
   }
-  function render(catId, animate){
-    paint(catId);
-    if(animate){ retrigger(pickCard,'swap'); retrigger(pickEarn,'swap'); }
-  }
-  function tick(){ idx=(idx+1)%ORDER.length; render(ORDER[idx], true); }
-  function startTimer(){ stopTimer(); if(playing && !reduce){ timer=setInterval(tick, 3000); } }
-  function stopTimer(){ if(timer){ clearInterval(timer); timer=null; } }
+  function showStatic(catId){ clearPhases(); resetVisual(); setActive(catId); wc[catId].classList.add('win');
+    paintEarn(catId); pickEl.classList.add('revealed'); pickTagEl.textContent = STR.pickTag[lang]; }
+
+  function next(){ idx=(idx+1)%ORDER.length; runCycle(ORDER[idx]); }
+  function start(){ stop(); if(playing){ driver=setInterval(next, 5400); } }
+  function stop(){ if(driver){ clearInterval(driver); driver=null; } clearPhases(); }
+
   function applyLang(){
-    Object.keys(LBL).forEach(function(k){ if(LBL[k]) LBL[k].textContent = STR[k][lang]; });
-    paint(ORDER[idx]);                                                // refresh unit + why in the new language
+    if(LBL.abSub) LBL.abSub.textContent=STR.abSub[lang];
+    if(LBL.abMain) LBL.abMain.textContent=STR.abMain[lang];
+    if(LBL.earnLabel) LBL.earnLabel.textContent=STR.earnLabel[lang];
+    paintEarn(ORDER[idx]);
+    if(pickEl.classList.contains('revealed')) pickTagEl.textContent=STR.pickTag[lang];
   }
 
   catBtns.forEach(function(b){ b.addEventListener('click', function(){
-    idx=ORDER.indexOf(b.getAttribute('data-cat')); render(ORDER[idx], true); if(playing) startTimer();
+    idx=ORDER.indexOf(b.getAttribute('data-cat'));
+    if(playing){ runCycle(ORDER[idx]); start(); } else { showStatic(ORDER[idx]); }
   }); });
 
   new MutationObserver(function(){
@@ -1085,9 +1110,8 @@ html[dir="rtl"] .hero::before{background:radial-gradient(680px 520px at 22% 34%,
     if(l!==lang){ lang=l; applyLang(); }
   }).observe(document.documentElement, {attributes:true, attributeFilter:['lang']});
 
-  render(ORDER[0], false);
   applyLang();
-  startTimer();
+  if(playing){ runCycle(ORDER[0]); start(); } else { showStatic(ORDER[0]); }
 })();
 </script>
 
