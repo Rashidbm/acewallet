@@ -289,6 +289,7 @@ html[lang="ar"] .closer-grid .closer-line{ font-size:clamp(24px,4.8vw,46px) }
 .aw-3d{ position:relative; z-index:1; width:100%; max-width:460px; height:clamp(380px, 40vw, 540px);
   background:transparent; --poster-color:transparent; cursor:grab }
 .aw-3d:active{ cursor:grabbing }
+.aw-3d::part(default-progress-bar){ display:none }   /* hide model-viewer's load bar (the "glitch line") */
 @media(max-width:820px){
   .closer-in.closer-grid{ grid-template-columns:minmax(0,1fr); gap:6px; justify-items:center; text-align:center }
   .closer-grid .signup{ margin-inline:auto } .closer-grid .form-foot{ justify-content:center }
