@@ -290,11 +290,11 @@ html[lang="ar"] .closer-grid .closer-line{ font-size:clamp(24px,4.8vw,46px) }
   background:transparent; --poster-color:transparent; cursor:grab }
 .aw-3d:active{ cursor:grabbing }
 @media(max-width:820px){
-  .closer-in.closer-grid{ grid-template-columns:1fr; gap:10px; justify-items:center; text-align:center }
+  .closer-in.closer-grid{ grid-template-columns:1fr; gap:6px; justify-items:center; text-align:center }
   .closer-grid .signup{ margin-inline:auto } .closer-grid .form-foot{ justify-content:center }
   .closer-copy{ order:1 } .closer-watch{ order:2 }
-  .closer-watch{ width:100%; max-width:380px; min-height:auto }
-  .aw-3d{ height:clamp(320px, 80vw, 420px) }
+  .closer-watch{ width:100%; max-width:300px; min-height:auto }
+  .aw-3d{ height:clamp(240px, 64vw, 300px) }
 }
 
 /* ---------- footer ---------- */
@@ -1002,7 +1002,7 @@ using Ace</span>
       </div>
       <div class="closer-watch" data-reveal style="transition-delay:.16s" aria-hidden="true">
         <span class="aw-glow"></span>
-        <model-viewer class="aw-3d" src="assets/watch3d/watch.gltf"
+        <model-viewer class="aw-3d" src="assets/watch.glb"
           alt="A real Apple Watch paying with AceWallet — emerald band, our card on screen" loading="lazy" reveal="auto"
           auto-rotate auto-rotate-delay="900" rotation-per-second="20deg" interaction-prompt="none"
           camera-controls disable-zoom disable-pan touch-action="pan-y"
@@ -1477,6 +1477,22 @@ if(player && label){
   /* keep the category label localized when the page language toggles */
   new MutationObserver(function(){ apply(CATS[i], false); })
     .observe(document.documentElement, {attributes:true, attributeFilter:['lang']});
+})();
+</script>
+
+<script>
+/* Closer 3D watch: interactive (drag to rotate) on desktop; on mobile make it
+   non-interactive so vertical swipes scroll the page instead of the model
+   capturing the touch (and spinning forever). auto-rotate runs in both. */
+(function(){
+  var mv = document.querySelector('.aw-3d'); if(!mv) return;
+  var mq = window.matchMedia('(max-width:820px)');
+  function sync(){
+    if(mq.matches){ mv.removeAttribute('camera-controls'); mv.setAttribute('disable-tap',''); }
+    else { mv.setAttribute('camera-controls',''); }
+  }
+  sync();
+  if(mq.addEventListener) mq.addEventListener('change', sync); else mq.addListener(sync);
 })();
 </script>
 </body>
