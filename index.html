@@ -1001,7 +1001,7 @@ using Ace</span>
       </div>
       <div class="closer-watch" data-reveal style="transition-delay:.16s" aria-hidden="true">
         <span class="aw-glow"></span>
-        <img class="aw-3d" src="assets/watch-spin.webp" width="622" height="600"
+        <img class="aw-3d" id="awWatch" src="assets/watch-spin.webp" width="622" height="600"
           alt="Apple Watch paying with AceWallet — emerald band, our card on screen" loading="lazy" decoding="async" />
       </div>
     </div>
@@ -1477,5 +1477,35 @@ if(player && label){
 })();
 </script>
 
+<script>
+/* Closer watch — hybrid for "real sourced animation" + "fast/seamless":
+   • Mobile (and any reduced-motion): keep the lightweight pre-rendered WebP loop (no WebGL).
+   • Desktop: upgrade to the REAL sourced 3D model (Sketchfab GLTF) with drag-to-rotate.
+   The WebP doubles as the poster so the 3D appears instantly while it streams in. */
+(function(){
+  var img = document.getElementById('awWatch'); if(!img) return;
+  var deskMQ = window.matchMedia('(min-width:821px)');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce || !deskMQ.matches) return;            // mobile / reduced-motion keep the light loop
+  var s = document.createElement('script'); s.type = 'module';
+  s.src = 'https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js';
+  s.onload = function(){
+    if(!document.getElementById('awWatch')) return;
+    var mv = document.createElement('model-viewer');
+    mv.className = 'aw-3d';
+    mv.setAttribute('src','assets/watch.glb');
+    mv.setAttribute('poster','assets/watch-spin.webp');   // instant, seamless reveal
+    mv.setAttribute('reveal','auto'); mv.setAttribute('loading','eager');
+    mv.setAttribute('auto-rotate',''); mv.setAttribute('rotation-per-second','20deg');
+    mv.setAttribute('interaction-prompt','none'); mv.setAttribute('camera-controls','');
+    mv.setAttribute('disable-zoom',''); mv.setAttribute('disable-pan','');
+    mv.setAttribute('shadow-intensity','0'); mv.setAttribute('environment-image','neutral');
+    mv.setAttribute('camera-orbit','180deg 78deg auto'); mv.setAttribute('field-of-view','16deg');
+    mv.style.height = 'clamp(380px,40vw,540px)';
+    document.getElementById('awWatch').replaceWith(mv);
+  };
+  document.head.appendChild(s);
+})();
+</script>
 </body>
 </html>
