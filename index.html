@@ -131,14 +131,14 @@ html[lang="ar"] .wyg-card h3,
 html[lang="ar"] .hiw-cap h3{ line-height:1.35; letter-spacing:0 }
 .hero-in{position:relative; z-index:1; display:grid; grid-template-columns:1.04fr .96fr; gap:40px; align-items:center;
   max-width:var(--maxw); margin:0 auto; padding:36px 24px 64px; min-height:min(860px, calc(100dvh - 64px))}
-.hero-copy{max-width:580px}
+.hero-copy{max-width:580px; min-width:0}
 .h1{font-size:clamp(34px,5.3vw,58px); line-height:1.04; letter-spacing:-.032em; font-weight:600; margin:0; color:#fff}
 .hero-sub{margin:24px 0 0; font-size:clamp(16px,1.85vw,19px); line-height:1.6; color:#c4c4ca; max-width:46ch}
 .hero-sub .rot{color:var(--emerald); font-weight:600}
 .hero-form{margin-top:30px; max-width:440px}
 .hero-visual{display:flex; justify-content:center; align-items:center}
 @media(max-width:920px){
-  .hero-in{grid-template-columns:1fr; gap:8px; min-height:0; padding:20px 24px 48px; text-align:center}
+  .hero-in{grid-template-columns:minmax(0,1fr); gap:8px; min-height:0; padding:20px 24px 48px; text-align:center}
   .hero-copy{max-width:none; margin:0 auto}
   .hero-sub{margin-inline:auto}
   .hero-form{margin-inline:auto}
@@ -290,10 +290,11 @@ html[lang="ar"] .closer-grid .closer-line{ font-size:clamp(24px,4.8vw,46px) }
   background:transparent; --poster-color:transparent; cursor:grab }
 .aw-3d:active{ cursor:grabbing }
 @media(max-width:820px){
-  .closer-in.closer-grid{ grid-template-columns:1fr; gap:6px; justify-items:center; text-align:center }
+  .closer-in.closer-grid{ grid-template-columns:minmax(0,1fr); gap:6px; justify-items:center; text-align:center }
   .closer-grid .signup{ margin-inline:auto } .closer-grid .form-foot{ justify-content:center }
   .closer-copy{ order:1 } .closer-watch{ order:2 }
   .closer-watch{ width:100%; max-width:300px; min-height:auto }
+  .closer-watch .aw-glow{ width:260px; height:260px }
   .aw-3d{ height:clamp(240px, 64vw, 300px) }
 }
 
