@@ -281,12 +281,13 @@ html[lang="ar"] .closer-line{ white-space:nowrap; font-size:clamp(22px,5.8vw,54p
 .closer-copy{ min-width:0 }
 .closer-grid .closer-line, .closer-grid p, html[lang="ar"] .closer-grid .closer-line{ white-space:normal }
 .closer-grid .closer-line{ font-size:clamp(21px,4vw,47px) }
-html[lang="ar"] .closer-grid .closer-line{ font-size:clamp(22px,4.8vw,46px) }
+html[lang="ar"] .closer-grid .closer-line{ font-size:clamp(28px,6vw,58px) }   /* AR text is short — size it up for impact */
 .closer-grid .signup{ margin-inline:0 } .closer-grid .form-foot{ justify-content:flex-start }
 .closer-watch{ position:relative; display:flex; align-items:center; justify-content:center; min-height:460px }
 .aw-glow{ position:absolute; width:380px; height:380px; border-radius:50%; left:50%; top:50%; transform:translate(-50%,-50%);
   background:radial-gradient(closest-side, rgba(43,209,126,.26), transparent 72%); filter:blur(46px); z-index:0; pointer-events:none }
 .aw-3d{ position:relative; z-index:1; width:100%; max-width:430px; height:auto; display:block; margin-inline:auto }
+.aw-poster{ height:clamp(380px,40vw,540px); object-fit:contain }   /* static placeholder matches the model-viewer box → no shift on upgrade */
 @media(max-width:960px){
   .closer-in.closer-grid{ grid-template-columns:minmax(0,1fr); gap:6px; justify-items:center; text-align:center }
   .closer-grid .signup{ margin-inline:auto } .closer-grid .form-foot{ justify-content:center }
@@ -1001,7 +1002,7 @@ using Ace</span>
       </div>
       <div class="closer-watch" data-reveal style="transition-delay:.16s" aria-hidden="true">
         <span class="aw-glow"></span>
-        <img class="aw-3d" id="awWatch" src="assets/watch-spin.webp" width="622" height="600"
+        <img class="aw-3d aw-poster" id="awWatch" src="assets/watch-poster.webp" width="480" height="480"
           alt="Apple Watch paying with AceWallet — emerald band, our card on screen" loading="lazy" decoding="async" />
       </div>
     </div>
@@ -1402,6 +1403,28 @@ if(player && label){
   let tries = 0;
   const ivPoll = setInterval(() => { if(wire() || ++tries > 50) clearInterval(ivPoll); }, 80);
 }
+
+/* Pause the Apple-Pay glyph players whenever the "how it works" section is off-
+   screen (or the tab is hidden). dotLottie runs a main-thread render loop, so
+   parking it when you're not looking keeps scrolling elsewhere buttery.        */
+(function(){
+  var how = document.getElementById('how'); if(!how) return;
+  var visible = false;
+  function apply(){
+    how.querySelectorAll('dotlottie-player').forEach(function(p){
+      try { visible ? (p.play && p.play()) : (p.pause && p.pause()); } catch(e){}
+    });
+  }
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(function(es){
+      visible = es.some(function(e){ return e.isIntersecting; });
+      apply();
+    }, {rootMargin:'140px 0px'}).observe(how);
+  } else { visible = true; }
+  how.querySelectorAll('dotlottie-player').forEach(function(p){ p.addEventListener('ready', apply); });
+  var n = 0, iv = setInterval(function(){ apply(); if(++n > 20) clearInterval(iv); }, 250); // catch async init (~5s)
+  document.addEventListener('visibilitychange', function(){ if(document.hidden){ visible = false; apply(); } });
+})();
 </script>
 
 <script>
@@ -1478,33 +1501,46 @@ if(player && label){
 </script>
 
 <script>
-/* Closer watch — hybrid for "real sourced animation" + "fast/seamless":
-   • Mobile (and any reduced-motion): keep the lightweight pre-rendered WebP loop (no WebGL).
-   • Desktop: upgrade to the REAL sourced 3D model (Sketchfab GLTF) with drag-to-rotate.
-   The WebP doubles as the poster so the 3D appears instantly while it streams in. */
+/* Closer watch — REAL 3D on every device, rendered on the GPU (no CPU-decoded
+   image loop). A tiny static poster (~18KB) paints instantly; the model-viewer
+   lib + GLB are lazy-loaded only when the user nears the closer (Intersection
+   Observer, ~1 screen ahead), so initial load stays light. model-viewer pauses
+   its render loop off-screen, so it costs nothing once scrolled past.
+   Desktop gets drag-to-rotate; touch devices auto-rotate only (scroll-safe).   */
 (function(){
   var img = document.getElementById('awWatch'); if(!img) return;
-  var deskMQ = window.matchMedia('(min-width:961px)');
-  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(reduce || !deskMQ.matches) return;            // mobile / reduced-motion keep the light loop
-  var s = document.createElement('script'); s.type = 'module';
-  s.src = 'https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js';
-  s.onload = function(){
-    if(!document.getElementById('awWatch')) return;
-    var mv = document.createElement('model-viewer');
-    mv.className = 'aw-3d';
-    mv.setAttribute('src','assets/watch.glb');
-    mv.setAttribute('poster','assets/watch-spin.webp');   // instant, seamless reveal
-    mv.setAttribute('reveal','auto'); mv.setAttribute('loading','eager');
-    mv.setAttribute('auto-rotate',''); mv.setAttribute('rotation-per-second','20deg');
-    mv.setAttribute('interaction-prompt','none'); mv.setAttribute('camera-controls','');
-    mv.setAttribute('disable-zoom',''); mv.setAttribute('disable-pan','');
-    mv.setAttribute('shadow-intensity','0'); mv.setAttribute('environment-image','neutral');
-    mv.setAttribute('camera-orbit','180deg 78deg auto'); mv.setAttribute('field-of-view','16deg');
-    mv.style.height = 'clamp(380px,40vw,540px)';
-    document.getElementById('awWatch').replaceWith(mv);
-  };
-  document.head.appendChild(s);
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;  // keep the static poster
+  var desk = window.matchMedia('(min-width:961px)');
+  var done = false;
+  function upgrade(){
+    if(done) return; done = true;
+    var s = document.createElement('script'); s.type = 'module';
+    s.src = 'https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js';
+    s.onload = function(){
+      var el = document.getElementById('awWatch'); if(!el) return;
+      var mv = document.createElement('model-viewer');
+      mv.className = 'aw-3d';
+      mv.setAttribute('src','assets/watch.glb');
+      mv.setAttribute('poster','assets/watch-poster.webp');   // same image as the placeholder → seamless
+      mv.setAttribute('reveal','auto');
+      mv.setAttribute('auto-rotate',''); mv.setAttribute('rotation-per-second','18deg');
+      mv.setAttribute('interaction-prompt','none');
+      mv.setAttribute('shadow-intensity','0'); mv.setAttribute('environment-image','neutral'); mv.setAttribute('exposure','1.05');
+      mv.setAttribute('camera-orbit','180deg 78deg auto'); mv.setAttribute('field-of-view','16deg');
+      mv.setAttribute('disable-zoom','');
+      if(desk.matches){ mv.setAttribute('camera-controls',''); mv.setAttribute('disable-pan',''); }
+      mv.style.height = 'clamp(380px,40vw,540px)';
+      el.replaceWith(mv);
+    };
+    document.head.appendChild(s);
+  }
+  var target = document.querySelector('.closer-watch') || img;
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){
+      if(es.some(function(e){ return e.isIntersecting; })){ io.disconnect(); upgrade(); }
+    }, {rootMargin:'800px 0px'});
+    io.observe(target);
+  } else { upgrade(); }
 })();
 </script>
 </body>
