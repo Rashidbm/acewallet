@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="color-scheme" content="dark" />
 <meta name="description" content="AceWallet automatically pays with your best card for every purchase, across the cards you already carry. Bilingual smart wallet for Saudi Arabia." />
-<title>AceWallet · Always play your ace</title>
+<title>AceWallet · With every transaction, play your ace</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -87,7 +87,7 @@ button{font-family:inherit}
 .lang-btn{background:rgba(255,255,255,.05); color:var(--text); border:1px solid var(--border-2);
   border-radius:999px; padding:8px 14px; font-size:13px; font-weight:600; cursor:pointer; transition:background .2s; min-width:74px}
 .lang-btn:hover{background:rgba(255,255,255,.1)}
-@media(max-width:740px){ .nav-links{display:none} .nav-cta{display:none} }
+@media(max-width:740px){ .nav-links{display:none} .nav-in{gap:10px; padding:0 16px} .lang-btn{min-width:0; padding:7px 11px} .nav-cta{padding:8px 13px; font-size:13px} }
 
 /* ---------- section rhythm ---------- */
 .sec{padding:104px 0; position:relative}
@@ -983,7 +983,7 @@ using Ace</span>
     <div class="closer-in closer-grid">
       <div class="closer-copy">
       <h2 class="closer-line" data-reveal>
-        <span data-en="Always play your " data-ar="في كل عملية، العب "></span><span class="ace" data-en="ace" data-ar="كبيرك">ace</span><span data-en="." data-ar=".">.</span>
+        <span data-en="With every transaction, play your " data-ar="في كل عملية، العب "></span><span class="ace" data-en="ace" data-ar="كبيرك">ace</span><span data-en="." data-ar=".">.</span>
       </h2>
       <p data-reveal style="transition-delay:.06s" data-en="What&rsquo;s gone is gone — don&rsquo;t let tomorrow&rsquo;s rewards slip away."
          data-ar="اللي راح راح — لا تخلي مكافآت بكرة تضيع.">What&rsquo;s gone is gone — don&rsquo;t let tomorrow&rsquo;s rewards slip away.</p>
@@ -1024,7 +1024,7 @@ using Ace</span>
       <a href="#get" data-en="What you get" data-ar="ما الذي تحصل عليه">What you get</a>
       <a href="faq.html" data-en="FAQ" data-ar="الأسئلة الشائعة">FAQ</a>
     </nav>
-    <span class="tag" data-en="Always play your ace." data-ar="في كل عملية، العب كبيرك.">Always play your ace.</span>
+    <span class="tag" data-en="With every transaction, play your ace." data-ar="في كل عملية، العب كبيرك.">With every transaction, play your ace.</span>
   </div>
 </footer>
 
@@ -1100,7 +1100,9 @@ using Ace</span>
     el.appendChild(inner);
     var meas = document.createElement('span');
     meas.setAttribute('aria-hidden','true');
-    meas.style.cssText = 'position:absolute;left:-9999px;top:0;white-space:nowrap;pointer-events:none;visibility:hidden';
+    /* position:fixed (not absolute:-9999px) so the off-screen measurer never expands the
+       document's scroll width — that was causing infinite horizontal scroll on mobile. */
+    meas.style.cssText = 'position:fixed;left:0;top:0;white-space:nowrap;pointer-events:none;visibility:hidden';
     el.appendChild(meas);
     var i = 0, timer = null, timers = [];
 
