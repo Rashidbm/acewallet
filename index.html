@@ -10,6 +10,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<!-- import map for the vendored Three.js (closer-section payment scene + its loaders' internal "three" imports) -->
+<script type="importmap">
+{ "imports": { "three": "./assets/vendor/three/build/three.module.js", "three/addons/": "./assets/vendor/three/examples/jsm/" } }
+</script>
 <!-- Phosphor icons (hero category/reward row + feature cards) -->
 <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 <!-- dotLottie player (hero "hold near reader" glyph + step-4 confirm glyph) -->
@@ -287,7 +291,12 @@ html[lang="ar"] .closer-grid .closer-line{ font-size:clamp(28px,6vw,58px) }   /*
 .aw-glow{ position:absolute; width:380px; height:380px; border-radius:50%; left:50%; top:50%; transform:translate(-50%,-50%);
   background:radial-gradient(closest-side, rgba(43,209,126,.26), transparent 72%); filter:blur(46px); z-index:0; pointer-events:none }
 .aw-3d{ position:relative; z-index:1; width:100%; max-width:430px; height:auto; display:block; margin-inline:auto }
-.aw-poster{ height:clamp(380px,40vw,540px); object-fit:contain }   /* static placeholder matches the model-viewer box → no shift on upgrade */
+.aw-poster{ height:clamp(380px,40vw,540px); object-fit:contain; transition:opacity .55s ease .12s }   /* static placeholder matches the live box → no shift on upgrade */
+/* live Three.js payment scene mounts here, square so it gets the full desktop composition; fades in over the poster */
+.closer-watch .aw-stage{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:1; width:100%; max-width:440px; aspect-ratio:1/1; opacity:0; transition:opacity .55s ease }
+.closer-watch .aw-stage.is-ready{ opacity:1 }
+.closer-watch .aw-stage canvas{ width:100%!important; height:100%!important; display:block }
+.closer-watch.aw-live .aw-poster{ opacity:0 }
 @media(max-width:960px){
   .closer-in.closer-grid{ grid-template-columns:minmax(0,1fr); gap:6px; justify-items:center; text-align:center }
   .closer-grid .signup{ margin-inline:auto } .closer-grid .form-foot{ justify-content:center }
@@ -1501,19 +1510,20 @@ if(player && label){
 </script>
 
 <script>
-/* Closer watch — REAL 3D on every device, rendered on the GPU (no CPU-decoded
-   image loop). A tiny static poster (~18KB) paints instantly; the model-viewer
-   lib + GLB are lazy-loaded only when the user nears the closer (Intersection
-   Observer, ~1 screen ahead), so initial load stays light. model-viewer pauses
-   its render loop off-screen, so it costs nothing once scrolled past.
-   Desktop gets drag-to-rotate; touch devices auto-rotate only (scroll-safe).   */
+/* Closer watch — the REAL AceWallet tap-to-pay scene (Three.js), rendered on the GPU. A tiny
+   static poster (~18KB) paints instantly; the scene is lazy-loaded only when the user nears the
+   closer (IntersectionObserver, ~1 screen ahead), so initial load stays light. The scene pauses
+   its own render loop off-screen. Reduce-motion keeps the static poster. If WebGL/the scene fails
+   to load, it falls back to the old auto-rotating model-viewer spin. */
 (function(){
   var img = document.getElementById('awWatch'); if(!img) return;
   if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;  // keep the static poster
+  var cw = document.querySelector('.closer-watch'); if(!cw) return;
   var desk = window.matchMedia('(min-width:961px)');
   var done = false;
-  function upgrade(){
-    if(done) return; done = true;
+
+  // fallback: the original model-viewer auto-rotate spin (only if the payment scene can't run)
+  function mountSpin(){
     var s = document.createElement('script'); s.type = 'module';
     s.src = 'https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js';
     s.onload = function(){
@@ -1521,7 +1531,7 @@ if(player && label){
       var mv = document.createElement('model-viewer');
       mv.className = 'aw-3d';
       mv.setAttribute('src','assets/watch.glb');
-      mv.setAttribute('poster','assets/watch-poster.webp');   // same image as the placeholder → seamless
+      mv.setAttribute('poster','assets/watch-poster.webp');
       mv.setAttribute('reveal','auto');
       mv.setAttribute('auto-rotate',''); mv.setAttribute('rotation-per-second','18deg');
       mv.setAttribute('interaction-prompt','none');
@@ -1534,12 +1544,24 @@ if(player && label){
     };
     document.head.appendChild(s);
   }
-  var target = document.querySelector('.closer-watch') || img;
+
+  function upgrade(){
+    if(done) return; done = true;
+    var stage = document.createElement('div'); stage.className = 'aw-stage';
+    cw.appendChild(stage);
+    stage.addEventListener('watchpay:ready', function(){ stage.classList.add('is-ready'); cw.classList.add('aw-live'); });
+    stage.addEventListener('watchpay:error', function(){ stage.remove(); mountSpin(); });
+    import('./assets/watch-pay.js').catch(function(e){
+      console.error('[closer] payment scene failed to load', e);
+      stage.remove(); mountSpin();   // graceful fallback to the spin
+    });
+  }
+
   if('IntersectionObserver' in window){
     var io = new IntersectionObserver(function(es){
       if(es.some(function(e){ return e.isIntersecting; })){ io.disconnect(); upgrade(); }
     }, {rootMargin:'800px 0px'});
-    io.observe(target);
+    io.observe(cw);
   } else { upgrade(); }
 })();
 </script>
