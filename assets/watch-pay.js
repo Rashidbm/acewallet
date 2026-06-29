@@ -3,6 +3,11 @@ import { GLTFLoader } from "./vendor/three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "./vendor/three/examples/jsm/loaders/DRACOLoader.js";
 
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+// Touch / small-viewport devices get a lighter render path: a half-res screen texture redrawn at
+// 30fps instead of a 1024² one re-uploaded at 60fps (~8x less per-frame GPU/raster work). Invisible
+// at phone size, but it's what was making the scene heavy on mobile Safari. No 3D quality is lost.
+const lowPower = window.matchMedia("(pointer: coarse)").matches
+              || window.matchMedia("(max-width: 960px)").matches;
 const stage = document.querySelector(".aw-stage") || document.querySelector(".stage");
 
 // --- interactivity: cursor parallax + optional scroll-scrubbed playback ---------------
@@ -392,7 +397,7 @@ function screenFor(t){
 function updateWatchScreen(t){
   if (!screenTexture || !screenCtx) return;
   const nextScreen = screenFor(t);
-  const frame = Math.floor(t * 60);
+  const frame = Math.floor(t * (lowPower ? 30 : 60));   // mobile: redraw/upload the screen at 30fps, not 60
   if (frame === lastScreenFrame && nextScreen === currentScreen) return;
   currentScreen = nextScreen;
   lastScreenFrame = frame;
@@ -536,10 +541,14 @@ async function loadTextures(){
 }
 
 function createWatchScreenTexture(){
+  // mobile: 512² backing store = 1/4 the texture bytes uploaded each redraw (invisible at phone size).
+  // We keep the 1024 design space by base-scaling the context, so no draw code below has to change.
+  const px = lowPower ? 512 : 1024;
   screenCanvas = document.createElement("canvas");
-  screenCanvas.width = 1024;
-  screenCanvas.height = 1024;
+  screenCanvas.width = px;
+  screenCanvas.height = px;
   screenCtx = screenCanvas.getContext("2d");
+  if (px !== 1024) screenCtx.scale(px / 1024, px / 1024);
   drawWatchScreen(0);
   screenTexture = new THREE.CanvasTexture(screenCanvas);
   screenTexture.colorSpace = THREE.SRGBColorSpace;
